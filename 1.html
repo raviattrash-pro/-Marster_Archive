@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Royal Success Archive | 💎 Diamond Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Patrick+Hand&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --gold: #ffd700; 
+            --gold-glow: rgba(255, 215, 0, 0.5);
+            /* Diamond Palette */
+            --glass-border-light: rgba(255, 255, 255, 0.6);
+            --glass-border-dark: rgba(255, 255, 255, 0.1);
+            --glass-surface: rgba(255, 255, 255, 0.05);
+            --glass-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            --text-color: #ffffff;
+        }
+
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; outline: none; }
+        
+        body {
+            font-family: 'Patrick Hand', cursive; 
+            background: #000;
+            margin: 0; padding: 0; display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; overflow: hidden; perspective: 1500px;
+            touch-action: none;
+            color: var(--text-color);
+        }
+
+        /* --- 1. LUXURY BACKGROUND --- */
+        .bg-gradient {
+            position: fixed; inset: 0; z-index: -2;
+            /* Richer, Darker for Diamond Contrast */
+            background: radial-gradient(circle at 50% -20%, #1a1a2e, #000000 80%);
+        }
+        
+        .orb {
+            position: absolute; border-radius: 50%; filter: blur(90px); z-index: -1; opacity: 0.5;
+            animation: floatOrb 20s infinite alternate ease-in-out;
+        }
+        /* Bright colors to shine through the glass */
+        .orb-1 { width: 600px; height: 600px; background: #4b0082; top: -20%; left: -20%; animation-duration: 25s; }
+        .orb-2 { width: 500px; height: 500px; background: #003366; bottom: -10%; right: -10%; animation-duration: 30s; }
+        .orb-3 { width: 300px; height: 300px; background: #b8860b; top: 40%; left: 40%; opacity: 0.3; animation-duration: 18s; }
+
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, -30px) scale(1.1); }
+        }
+
+        /* --- 2. 3D BOOK ENGINE --- */
+        .scene { 
+            width: 92%; max-width: 420px; height: 80vh; 
+            transform-style: preserve-3d; 
+            margin-bottom: 160px; /* Space for buttons */
+            position: relative;
+        }
+        .book { 
+            position: relative; width: 100%; height: 100%; 
+            background: rgba(255, 255, 255, 0.01); 
+            border-radius: 24px; 
+            transform-style: preserve-3d; 
+            box-shadow: 0 40px 80px rgba(0,0,0,0.8); 
+            transition: transform 0.2s ease-out; 
+        }
+
+        /* --- SPIRAL BINDING (Metallic) --- */
+        .spiral-rail {
+            position: absolute; top: -25px; left: 15px; width: 90%; height: 60px;
+            display: flex; justify-content: space-evenly; z-index: 2000; pointer-events: none;
+        }
+        .wire-container { display: flex; flex-direction: column; align-items: center; }
+        .wire {
+            width: 12px; height: 50px; 
+            background: linear-gradient(90deg, #333, #fff, #888, #333); /* Chrome look */
+            border-radius: 6px; box-shadow: 0 4px 8px rgba(0,0,0,0.9); transform: rotate(-4deg);
+        }
+        .hole-punch {
+            width: 14px; height: 14px; background: #000; border-radius: 50%;
+            margin-top: -12px; box-shadow: inset 0 0 5px rgba(255,255,255,0.2); z-index: -1;
+        }
+
+        /* --- COVER (DIAMOND PRISM) --- */
+        .cover { 
+            position: absolute; inset: 0; 
+            /* Multi-layered Glass Effect */
+            background: rgba(15, 20, 35, 0.7); 
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            
+            /* Diamond Borders: Bright top/left, Dark bottom/right */
+            border-top: 1px solid var(--glass-border-light);
+            border-left: 1px solid var(--glass-border-light);
+            border-right: 1px solid var(--glass-border-dark);
+            border-bottom: 4px solid var(--gold);
+            
+            border-radius: 24px; z-index: 500; transform-origin: top; 
+            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1); 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            backface-visibility: hidden; cursor: pointer; overflow: hidden;
+            
+            /* Shimmer Animation */
+            background-image: linear-gradient(110deg, transparent 25%, rgba(255,255,255,0.1) 50%, transparent 75%);
+            background-size: 200% 100%;
+            animation: diamondShimmer 5s infinite linear;
+        }
+
+        @keyframes diamondShimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        .main-plate {
+            z-index: 10; padding: 40px; 
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            text-align: center; border-radius: 18px;
+            transform: translateZ(60px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6), inset 0 0 40px rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+        }
+        .main-plate h1 { 
+            margin: 0; font-family: 'Playfair Display', serif; font-size: 2.8rem; letter-spacing: 5px; 
+            /* Gold Text Gradient */
+            background: linear-gradient(to bottom, #fff, #ffd700);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .main-plate p { color: #ccc; margin-top: 15px; font-size: 0.8rem; letter-spacing: 4px; font-weight: bold; text-transform: uppercase; }
+        .book.open .cover { transform: rotateX(175deg); opacity: 0; pointer-events: none; }
+
+        /* --- INSIDE PAGE (FROSTED CRYSTAL) --- */
+        .page-container { position: absolute; inset: 10px; transform-style: preserve-3d; }
+        .page { 
+            position: absolute; inset: 0; 
+            background: rgba(255, 255, 255, 0.06); 
+            backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+            padding: 30px 20px 100px 20px; 
+            border-radius: 16px; transform-origin: top; 
+            backface-visibility: hidden; transition: transform 0.8s; z-index: 10; overflow-y: auto;
+            border: 1px solid rgba(255,255,255,0.25); 
+            box-shadow: inset 0 0 40px rgba(255,255,255,0.05);
+            color: #fff;
+        }
+        .page.flipping { transform: rotateX(180deg) scale(1.02); filter: brightness(0.9); }
+
+        /* --- GLASS COMPONENTS (Cut Glass Look) --- */
+        .glass-box {
+            background: rgba(0, 0, 0, 0.2); 
+            border-top: 1px solid rgba(255, 255, 255, 0.4); /* Highlight top */
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            backdrop-filter: blur(12px);
+            transition: 0.3s;
+        }
+        .glass-box:hover { 
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--gold);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+        }
+
+        .section-tag { 
+            font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--gold); 
+            margin: 25px 0 10px; display: flex; align-items: center; gap: 8px; font-weight: 700; text-transform: uppercase; 
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+            padding-bottom: 5px;
+        }
+
+        .habit-dock { display: flex; justify-content: space-around; padding: 20px; }
+        .badge { font-size: 2rem; opacity: 0.3; transition: 0.4s; cursor: pointer; filter: grayscale(1); }
+        .badge.active { opacity: 1; transform: scale(1.3); filter: grayscale(0) drop-shadow(0 0 10px var(--gold)); }
+
+        .item-row { 
+            display: flex; align-items: center; gap: 12px; padding: 12px 0; 
+            border-bottom: 1px solid rgba(255,255,255,0.1); 
+        }
+        .custom-check { width: 22px; height: 22px; accent-color: var(--gold); cursor: pointer; filter: drop-shadow(0 0 4px var(--gold)); }
+        .input-box { border: none; background: transparent; font-family: inherit; width: 100%; font-size: 1.1rem; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+        .input-box::placeholder { color: rgba(255,255,255,0.3); }
+
+        textarea.glass-box { width: 100%; height: 120px; font-family: inherit; color: #fff; font-size: 1.1rem; resize: none; }
+
+        .gita-box { 
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(0,0,0,0.5));
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            text-align: center; font-style: italic; position: relative; margin-top: 40px;
+        }
+        .gita-box::before { 
+            content: '🕉'; position: absolute; top: -18px; left: 50%; transform: translateX(-50%); 
+            background: #000; padding: 4px 10px; color: var(--gold); border-radius: 50%; border: 1px solid var(--gold); box-shadow: 0 0 10px var(--gold);
+        }
+        .gita-text { font-family: 'Playfair Display', serif; color: #fff; margin-bottom: 8px; display: block; }
+        .gita-ref { color: var(--gold); font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; }
+
+        #pocket { max-height: 0; overflow: hidden; transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); margin-top:10px; }
+        #pocket.open { max-height: 1000px; padding-top: 15px; }
+        .drawer-handle { 
+            background: rgba(255,255,255,0.05); border: 1px solid var(--gold); color: var(--gold);
+            padding: 15px; text-align: center; cursor: pointer; border-radius: 12px; margin-top: 25px; 
+            font-weight: bold; transition: 0.3s; backdrop-filter: blur(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .drawer-handle:hover { background: rgba(255, 215, 0, 0.15); box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
+
+        .growth-meter { height: 10px; background: rgba(255,255,255,0.1); border-radius: 10px; margin: 15px 0; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); }
+        #growthFill { 
+            height: 100%; 
+            background: linear-gradient(90deg, #00c6ff, #0072ff);
+            box-shadow: 0 0 20px #0072ff;
+            transition: width 1s ease;
+        }
+
+        /* --- 3. NAVIGATION DOCK (JEWEL BAR) --- */
+        .nav-dock { 
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
+            display: flex; align-items: flex-end; justify-content: center; gap: 25px; 
+            
+            /* Crystal Bar Look */
+            background: rgba(255, 255, 255, 0.05); 
+            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            padding: 15px 35px; border-radius: 35px; 
+            z-index: 5000; 
+            border: 1px solid rgba(255, 255, 255, 0.25); 
+            border-top: 1px solid rgba(255, 255, 255, 0.5); /* Highlight top */
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        .nav-btn { 
+            width: 50px; height: 50px; border-radius: 50%; 
+            /* Glass Bead Look */
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), rgba(255,255,255,0.05));
+            border: 1px solid rgba(255,255,255,0.3);
+            display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; font-size: 1.3rem; transition: 0.3s; color: #fff; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .nav-btn:hover { 
+            background: rgba(255, 255, 255, 0.4); 
+            color: #fff; transform: translateY(-8px); 
+            box-shadow: 0 10px 20px rgba(255,255,255,0.2); 
+        }
+        
+        /* Crown Jewel */
+        .nav-btn.main { 
+            width: 75px; height: 75px; border-radius: 50%; 
+            background: linear-gradient(135deg, rgba(30, 10, 50, 0.9), rgba(0, 0, 0, 0.9)); 
+            color: var(--gold); border: 2px solid var(--gold); 
+            font-size: 2.2rem; margin-bottom: 12px; 
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+            display: flex; align-items: center; justify-content: center;
+            animation: pulseCrown 4s infinite;
+        }
+        @keyframes pulseCrown {
+            0% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); border-color: rgba(255,215,0,0.7); }
+            50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.7); border-color: #fff; }
+            100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); border-color: rgba(255,215,0,0.7); }
+        }
+
+        /* --- MODALS (FROSTED) --- */
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); z-index: 6000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        
+        .modal { 
+            background: rgba(20, 20, 30, 0.8); 
+            border: 1px solid rgba(255,255,255,0.4);
+            padding: 25px; border-radius: 25px; 
+            width: 100%; max-width: 380px; text-align: center; 
+            box-shadow: 0 30px 70px rgba(0,0,0,0.9);
+            color: #fff;
+            position: relative;
+        }
+        /* Modal inner glow */
+        .modal::after {
+            content:''; position: absolute; inset: 0; border-radius: 25px;
+            box-shadow: inset 0 0 30px rgba(255,255,255,0.05); pointer-events: none;
+        }
+
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .cal-nav-btn { background: transparent; border: 1px solid var(--gold); color: var(--gold); border-radius: 50%; width: 30px; height: 30px; cursor: pointer; transition: 0.3s; }
+        .cal-nav-btn:hover { background: var(--gold); color: #000; }
+        
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        .cal-day-name { font-size: 0.8rem; color: #888; font-weight: bold; margin-bottom: 5px; }
+        .cal-day { 
+            padding: 10px; border-radius: 8px; cursor: pointer; 
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            transition: 0.2s; font-size: 0.9rem;
+        }
+        .cal-day:hover { background: rgba(255, 215, 0, 0.3); border-color: var(--gold); }
+        .cal-day.selected { background: var(--gold); color: #000; font-weight: bold; box-shadow: 0 0 15px var(--gold); border: none; }
+        .cal-day.today { border: 1px solid var(--gold); color: var(--gold); }
+
+        .chart-svg { width: 100%; height: 120px; filter: drop-shadow(0 0 8px var(--gold)); }
+        .chart-line { fill: none; stroke: var(--gold); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+        
+        #waxSeal { position: absolute; bottom: 20px; right: 20px; font-size: 2.5rem; color: var(--gold); cursor: pointer; filter: drop-shadow(0 0 20px var(--gold)); opacity: 0; transition: 0.5s; transform: scale(0); }
+
+    </style>
+</head>
+<body onload="init()">
+
+    <div class="bg-gradient"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <audio id="flipSound"><source src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" type="audio/mpeg"></audio>
+    <input type="file" id="imgInp" hidden accept="image/*" onchange="processImg(event)">
+
+    <div class="overlay" id="calOverlay" onclick="this.style.display='none'">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="cal-header">
+                <button class="cal-nav-btn" onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+                <h2 id="calTitle" style="font-family: 'Playfair Display'; color: var(--gold); margin:0;"></h2>
+                <button class="cal-nav-btn" onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            <div id="calGrid" class="cal-grid"></div>
+            <button onclick="jumpToday()" style="width:100%; padding:12px; margin-top:20px; background:rgba(255,255,255,0.1); border:1px solid var(--gold); color:var(--gold); border-radius:10px; font-weight:bold; cursor:pointer; transition:0.3s;">JUMP TO TODAY</button>
+        </div>
+    </div>
+
+    <div class="overlay" id="reportOverlay" onclick="this.style.display='none'">
+        <div class="modal" onclick="event.stopPropagation()">
+            <h2 style="font-family: 'Playfair Display'; color: var(--gold);">⚜ ROYAL PROGRESS ⚜</h2>
+            <div style="font-size: 5rem; font-weight: 900; color: #fff; text-shadow: 0 0 30px var(--gold);" id="reportPerc">0%</div>
+            
+            <div class="glass-box" style="margin-top:20px;">
+                <p style="font-size: 0.8rem; color: #ccc; font-weight: bold; margin-bottom: 10px;">7-DAY HISTORY</p>
+                <svg class="chart-svg" id="historyChart" viewBox="0 0 350 120">
+                    <polyline class="chart-line" points="50,110 100,110 150,110 200,110 250,110 300,110" id="chartLine"></polyline>
+                </svg>
+            </div>
+            <button onclick="document.getElementById('reportOverlay').style.display='none'" style="width:100%; padding:14px; background: rgba(255,255,255,0.1); border:1px solid #fff; color:white; border-radius:12px; font-weight:bold; cursor:pointer; margin-top:10px;">PROCEED</button>
+        </div>
+    </div>
+
+    <div class="scene">
+        <div class="book" id="book" onmousemove="handleMove(event)" onmouseleave="resetMove()">
+            <div class="spiral-rail">
+                <div class="wire-container"><div class="wire"></div><div class="hole-punch"></div></div>
+                <div class="wire-container"><div class="wire"></div><div class="hole-punch"></div></div>
+                <div class="wire-container"><div class="wire"></div><div class="hole-punch"></div></div>
+                <div class="wire-container"><div class="wire"></div><div class="hole-punch"></div></div>
+                <div class="wire-container"><div class="wire"></div><div class="hole-punch"></div></div>
+                <div class="wire-container"><div class="wire"></div><div class="hole-punch"></div></div>
+                <div class="wire-container"><div class="wire"></div><div class="hole-punch"></div></div>
+                <div class="wire-container"><div class="wire"></div><div class="hole-punch"></div></div>
+            </div>
+
+            <div class="cover" onclick="openBook()">
+                <div class="main-plate">
+                    <h1>ARCHIVE</h1>
+                    <p>✨ Precision • Strategy • Power ✨</p>
+                </div>
+            </div>
+
+            <div class="page-container" id="swipeArea">
+                <div class="page" id="page">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span id="dateDisp" style="color:#fff; font-weight:bold; font-family: 'Playfair Display'; font-size:1.4rem;"></span>
+                        <span id="percDisp" style="color:var(--gold); font-weight:bold; font-size: 1.2rem; text-shadow:0 0 15px var(--gold);">0%</span>
+                    </div>
+                    <div class="growth-meter"><div id="growthFill"></div></div>
+
+                    <div class="section-tag">🌸 Royal Habits</div>
+                    <div class="glass-box habit-dock">
+                        <span class="badge" onclick="tapHabit('water')" id="h_water">💧</span>
+                        <span class="badge" onclick="tapHabit('gym')" id="h_gym">💪</span>
+                        <span class="badge" onclick="tapHabit('read')" id="h_read">📚</span>
+                        <span class="badge" onclick="tapHabit('sun')" id="h_sun">☀️</span>
+                        <span class="badge" onclick="tapHabit('zen')" id="h_zen">🧘</span>
+                    </div>
+
+                    <div class="section-tag">🎯 Core Goals</div>
+                    <div class="glass-box" id="goalsList"></div>
+
+                    <div class="section-tag">🕰️ Royal Timeline</div>
+                    <div class="glass-box" id="schedule"></div>
+                    
+                    <div class="section-tag">🏆 Royal Victory</div>
+                    <textarea id="notes" class="glass-box save" placeholder="Record today's royal victories..." oninput="save()"></textarea>
+
+                    <div class="gita-box glass-box">
+                        <span id="gitaTxt" class="gita-text"></span>
+                        <span id="gitaRef" class="gita-ref"></span>
+                    </div>
+
+                    <div class="drawer-handle" onclick="toggleDrawer()">🗝️ ACCESS SECRET COMPARTMENT</div>
+                    <div id="pocket">
+                        <div class="glass-box" style="text-align:center; padding-bottom:5px;" onclick="document.getElementById('imgInp').click()">
+                            <img id="userImg" src="" style="width:100%; border-radius:8px; display:none; border: 1px solid #fff;">
+                            <p style="color:#aaa; margin-top:10px;">⚜ TAP TO ADD IMAGE ⚜</p>
+                        </div>
+                        <textarea id="secret" class="glass-box save" style="margin-top:15px;" placeholder="Private royal thoughts..." oninput="save()"></textarea>
+                    </div>
+                    
+                    <div style="margin-top:30px; text-align:center; border:2px solid rgba(255,255,255,0.1); padding:15px; border-radius:10px;">
+                        <p style="font-family:'Playfair Display'; color:var(--gold); font-size:0.9rem; margin-bottom:5px;">ROYAL SIGNATURE</p>
+                        <input type="text" id="royalSignature" class="input-box save" style="text-align:center; font-style:italic; font-size:1.5rem; border-bottom:1px solid #555;" placeholder="Sign Here..." oninput="save()">
+                    </div>
+
+                    <div id="waxSeal" onclick="toggleSeal()">⚜</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="nav-dock">
+        <button class="nav-btn" onclick="openCal()"><i class="fas fa-calendar-alt"></i></button>
+        <button class="nav-btn" onclick="syncLast()"><i class="fas fa-magic"></i></button>
+        <button class="nav-btn main" onclick="closeBook()"><i class="fas fa-crown"></i></button>
+        <button class="nav-btn" onclick="clearDay()"><i class="fas fa-trash"></i></button>
+        <button class="nav-btn" onclick="openReport()"><i class="fas fa-chart-pie"></i></button>
+    </nav>
+
+<script>
+    let vDate = new Date(); vDate.setHours(0,0,0,0);
+    let flipping = false, sealed = false, habits = {};
+    let calViewDate = new Date();
+    
+    const GITA_QUOTES = [
+        {t: "You have a right to perform your prescribed duties, but you are not entitled to the fruits of your actions.", r: "Verse 2.47"},
+        {t: "Man is made by his belief. As he believes, so he is.", r: "Verse 17.3"},
+        {t: "A man's own self is his friend. A man's own self is his foe.", r: "Verse 6.5"},
+        {t: "The soul is neither born, and nor does it die.", r: "Verse 2.20"},
+        {t: "Perform your obligatory duty, for action is better than inaction.", r: "Verse 3.8"}
+    ];
+
+    function init() {
+        const gl = document.getElementById('goalsList'); gl.innerHTML = '';
+        for(let i=1; i<=3; i++) {
+            gl.innerHTML += `<div class="item-row"><input type="checkbox" id="gcheck_${i}" class="chk-save custom-check" onclick="save()"><input type="text" id="goal_${i}" class="save input-box" placeholder="Objective ${i}..." oninput="save()"></div>`;
+        }
+
+        const s = document.getElementById('schedule'); s.innerHTML = '';
+        for(let h=6; h<=23; h++) {
+            let lbl = h > 12 ? (h-12)+' PM' : (h==12 ? '12 PM' : h+' AM');
+            s.innerHTML += `<div class="item-row"><span style="font-size:0.8rem; color:var(--gold); width:50px; font-weight:bold;">${lbl}</span><input type="checkbox" id="c_${h}" class="chk-save custom-check" onclick="save()"><input type="text" id="t_${h}" class="save input-box" placeholder="..." oninput="save()"></div>`;
+        }
+
+        const swipeArea = document.getElementById('swipeArea');
+        let touchStartY = 0;
+        swipeArea.addEventListener('touchstart', e => { touchStartY = e.changedTouches[0].screenY; }, false);
+        swipeArea.addEventListener('touchend', e => { 
+            let touchEndY = e.changedTouches[0].screenY;
+            if (touchStartY - touchEndY > 60) turn(1);
+            if (touchEndY - touchStartY > 60) turn(-1);
+        }, false);
+        load();
+    }
+
+    function handleMove(e) {
+        const b = document.getElementById('book'); if(b.classList.contains('open')) return;
+        const rect = b.getBoundingClientRect();
+        const rx = ((e.clientY - rect.top) / rect.height - 0.5) * -20;
+        const ry = ((e.clientX - rect.left) / rect.width - 0.5) * 20;
+        b.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+    }
+
+    function resetMove() { document.getElementById('book').style.transform = `rotateX(0deg) rotateY(0deg)`; }
+    function getID(d) { return `royal_diamond_v2_${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; }
+    function openBook() { document.getElementById('book').classList.add('open'); }
+    function closeBook() { save(); document.getElementById('book').classList.remove('open'); }
+
+    function turn(dir) {
+        if(flipping) return; flipping = true; save();
+        document.getElementById('flipSound').play().catch(()=>{});
+        const p = document.getElementById('page'); p.classList.add('flipping');
+        setTimeout(() => {
+            vDate.setDate(vDate.getDate() + dir); load();
+            p.style.transition = 'none'; p.style.transform = 'rotateX(0deg)';
+            p.offsetHeight; p.style.transition = ''; p.classList.remove('flipping');
+            flipping = false;
+        }, 500);
+    }
+
+    function load() {
+        const key = getID(vDate);
+        const data = JSON.parse(localStorage.getItem(key)) || {};
+        sealed = data.sealed || false; habits = data.habits || {};
+        document.querySelectorAll('.save').forEach(el => { el.value = data[el.id] || ''; el.disabled = sealed; });
+        document.querySelectorAll('.chk-save').forEach(el => { el.checked = data[el.id] || false; el.disabled = sealed; });
+        
+        if(data.photo && data.photo.length > 50) {
+            document.getElementById('userImg').src = data.photo;
+            document.getElementById('userImg').style.display = 'block';
+        } else {
+            document.getElementById('userImg').style.display = 'none';
+        }
+
+        const ws = document.getElementById('waxSeal');
+        ws.style.transform = sealed ? 'scale(1) rotate(-15deg)' : 'scale(0)';
+        ws.style.opacity = sealed ? '1' : '0';
+        document.getElementById('page').classList.toggle('locked', sealed);
+        document.getElementById('dateDisp').innerText = vDate.toLocaleDateString(undefined, {weekday: 'short', month:'short', day:'numeric'});
+        const q = GITA_QUOTES[Math.abs(vDate.getDate() % GITA_QUOTES.length)];
+        document.getElementById('gitaTxt').innerText = `"${q.t}"`;
+        document.getElementById('gitaRef').innerText = `— BHAGAVAD GITA, ${q.r}`;
+        updateHabitUI(); updateGrowth();
+    }
+
+    function save() {
+        try {
+            const data = { sealed, photo: document.getElementById('userImg').src, habits: habits };
+            document.querySelectorAll('.save').forEach(el => data[el.id] = el.value);
+            document.querySelectorAll('.chk-save').forEach(el => data[el.id] = el.checked);
+            localStorage.setItem(getID(vDate), JSON.stringify(data));
+            updateGrowth();
+        } catch (e) { localStorage.removeItem(localStorage.key(0)); save(); }
+    }
+
+    function processImg(e) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = 600; let height = img.height * (600 / img.width);
+                canvas.width = width; canvas.height = height;
+                canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                document.getElementById('userImg').src = canvas.toDataURL('image/jpeg', 0.5);
+                document.getElementById('userImg').style.display = 'block';
+                save(); 
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(e.target.files[0]);
+    }
+
+    function updateGrowth() {
+        let hPoints = Object.values(habits).filter(v => v).length;
+        let tPoints = Array.from(document.querySelectorAll('.chk-save')).filter(x => x.checked).length;
+        let p = Math.min(Math.round(((hPoints + tPoints) / 26) * 100), 100);
+        document.getElementById('growthFill').style.width = p + '%';
+        document.getElementById('percDisp').innerText = p + '%';
+        return p;
+    }
+
+    function getHistory() {
+        let pts = [];
+        for(let i=6; i>=0; i--) {
+            let d = new Date(vDate); d.setDate(d.getDate() - i);
+            let data = JSON.parse(localStorage.getItem(getID(d))) || {};
+            let h = Object.values(data.habits || {}).filter(v => v).length;
+            let t = Object.keys(data).filter(k => k.startsWith('c_') && data[k]).length;
+            let g = Object.keys(data).filter(k => k.startsWith('gcheck_') && data[k]).length;
+            pts.push(Math.round(((h + t + g) / 26) * 100));
+        }
+        return pts;
+    }
+
+    function openReport() {
+        const p = updateGrowth();
+        document.getElementById('reportPerc').innerText = p + "%";
+        const history = getHistory();
+        let points = history.map((val, i) => `${50 + i * 42},${110 - val}`).join(' ');
+        document.getElementById('chartLine').setAttribute('points', points);
+        document.getElementById('reportOverlay').style.display = 'flex';
+    }
+
+    function tapHabit(id) { if(!sealed) { habits[id] = !habits[id]; updateHabitUI(); save(); } }
+    function updateHabitUI() { ['water','gym','read','sun','zen'].forEach(id => {
+        const b = document.getElementById('h_'+id); if(b) b.classList.toggle('active', !!habits[id]);
+    }); }
+    function toggleSeal() { sealed = !sealed; save(); load(); }
+    function toggleDrawer() { document.getElementById('pocket').classList.toggle('open'); }
+    
+    function jumpToday() { 
+        vDate = new Date(); vDate.setHours(0,0,0,0); 
+        load(); document.getElementById('calOverlay').style.display='none'; 
+    }
+    
+    function syncLast() {
+        let y = new Date(vDate); y.setDate(vDate.getDate()-1);
+        const d = JSON.parse(localStorage.getItem(getID(y)));
+        if(d && confirm("Mirror previous objectives?")) {
+            habits = d.habits || {};
+            for(let i=1; i<=3; i++) document.getElementById(`goal_${i}`).value = d[`goal_${i}`] || '';
+            for(let h=6; h<=23; h++) document.getElementById(`t_${h}`).value = d[`t_${h}`] || '';
+            save(); load();
+        }
+    }
+
+    function clearDay() { 
+        if(confirm("Purge current record?")) { 
+            localStorage.removeItem(getID(vDate)); 
+            habits = {}; sealed = false;
+            document.getElementById('userImg').src = "";
+            document.getElementById('userImg').style.display = 'none';
+            load(); 
+        } 
+    }
+
+    function openCal() {
+        calViewDate = new Date(vDate);
+        document.getElementById('calOverlay').style.display = 'flex';
+        renderCalendar();
+    }
+
+    function renderCalendar() {
+        const grid = document.getElementById('calGrid');
+        const title = document.getElementById('calTitle');
+        grid.innerHTML = '';
+
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        title.innerText = `${monthNames[calViewDate.getMonth()]} ${calViewDate.getFullYear()}`;
+
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        days.forEach(d => {
+            let el = document.createElement('div');
+            el.className = 'cal-day-name';
+            el.innerText = d;
+            grid.appendChild(el);
+        });
+
+        const firstDay = new Date(calViewDate.getFullYear(), calViewDate.getMonth(), 1);
+        const lastDay = new Date(calViewDate.getFullYear(), calViewDate.getMonth() + 1, 0);
+        const startDayIndex = firstDay.getDay(); 
+        const totalDays = lastDay.getDate();
+
+        for(let i=0; i<startDayIndex; i++) grid.appendChild(document.createElement('div'));
+
+        for(let i=1; i<=totalDays; i++) {
+            let el = document.createElement('div');
+            el.className = 'cal-day';
+            el.innerText = i;
+            let thisDate = new Date(calViewDate.getFullYear(), calViewDate.getMonth(), i);
+            
+            if (thisDate.toDateString() === vDate.toDateString()) el.classList.add('selected');
+            if (thisDate.toDateString() === new Date().toDateString()) el.classList.add('today');
+
+            el.onclick = () => {
+                vDate = new Date(thisDate); vDate.setHours(0,0,0,0);
+                load(); document.getElementById('calOverlay').style.display = 'none';
+            };
+            grid.appendChild(el);
+        }
+    }
+
+    function changeMonth(dir) {
+        calViewDate.setMonth(calViewDate.getMonth() + dir);
+        renderCalendar();
+    }
+</script>
+</body>
+</html>

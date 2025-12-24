@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dragon Ember Archive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Patrick+Hand&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --magma: #cf1515; --charcoal: #111; --ash: #333;
+            --ember: #ff4500; --gold: #ffd700; --paper: #fff5e6;
+        }
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; outline: none; }
+        
+        body {
+            font-family: 'Patrick Hand', cursive; 
+            background: #000;
+            margin: 0; padding: 0; display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; overflow: hidden; perspective: 1500px;
+        }
+
+        /* LAVA BACKGROUND */
+        .ember-bg {
+            position: fixed; inset: 0; z-index: -1;
+            background: radial-gradient(circle at bottom, #2a0a0a, #000);
+        }
+        .particle {
+            position: absolute; width: 4px; height: 4px; background: var(--ember);
+            border-radius: 50%; opacity: 0; animation: floatUp linear infinite;
+            box-shadow: 0 0 10px var(--ember);
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0.5); opacity: 1; }
+            100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+        }
+
+        /* BOOK SCENE */
+        .scene { width: 94%; max-width: 440px; height: 84vh; transform-style: preserve-3d; margin-bottom: 60px; }
+        .book { 
+            position: relative; width: 100%; height: 100%; 
+            background: #1a0505; border-radius: 12px; transform-style: preserve-3d; 
+            box-shadow: 0 50px 100px rgba(255, 69, 0, 0.1); transition: transform 0.2s; 
+            border: 1px solid #330000;
+        }
+
+        /* BINDING - METAL RINGS */
+        .ring-binder {
+            position: absolute; left: 15px; top: 0; bottom: 0; width: 30px;
+            display: flex; flex-direction: column; justify-content: space-evenly; z-index: 2000;
+        }
+        .ring {
+            width: 40px; height: 12px; background: linear-gradient(90deg, #555, #fff, #555);
+            border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.8);
+        }
+
+        /* COVER */
+        .cover { 
+            position: absolute; inset: 0; background: linear-gradient(135deg, #1a0000, #000);
+            border-radius: 12px; z-index: 500; transform-origin: left; 
+            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1); 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            backface-visibility: hidden; cursor: pointer; border: 2px solid var(--magma);
+        }
+        .book.open .cover { transform: rotateY(-160deg); }
+
+        .dragon-sigil {
+            font-size: 5rem; color: var(--ember); text-shadow: 0 0 20px var(--ember);
+            animation: pulse 3s infinite;
+        }
+        @keyframes pulse { 50% { opacity: 0.7; transform: scale(0.95); } }
+
+        .title-text {
+            font-family: 'Cinzel', serif; color: #fff; font-size: 2rem; margin-top: 20px;
+            text-transform: uppercase; letter-spacing: 5px; border-bottom: 1px solid var(--magma);
+        }
+
+        /* PAGE */
+        .page { 
+            position: absolute; inset: 10px 10px 10px 40px; background: var(--paper); 
+            padding: 20px; border-radius: 4px; transform-origin: left; 
+            backface-visibility: hidden; transition: transform 0.8s; z-index: 10; overflow-y: auto;
+            border-right: 5px solid #d4a0a0;
+            background-image: url('https://www.transparenttextures.com/patterns/aged-paper.png');
+        }
+        .page.flipping { transform: rotateY(-170deg); }
+
+        /* CONTENT STYLES */
+        .header-row { display: flex; justify-content: space-between; border-bottom: 2px solid var(--magma); padding-bottom: 10px; margin-bottom: 20px; }
+        .burn-text { font-family: 'Cinzel', serif; color: var(--magma); font-weight: bold; }
+
+        .habit-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px; }
+        .habit-btn { 
+            aspect-ratio: 1; border: 2px solid #ddd; border-radius: 8px; 
+            display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+            cursor: pointer; transition: 0.3s; opacity: 0.5; filter: grayscale(1);
+        }
+        .habit-btn.active { opacity: 1; border-color: var(--ember); color: var(--ember); filter: grayscale(0); box-shadow: 0 0 10px rgba(255,69,0,0.3); }
+
+        .task-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px dashed #ccc; }
+        .fire-check { accent-color: var(--ember); width: 20px; height: 20px; cursor: pointer; }
+        .fire-input { border: none; background: transparent; width: 100%; font-family: inherit; font-size: 1.1rem; }
+
+        #notes { width: 100%; height: 100px; border: 1px solid #ccc; background: rgba(0,0,0,0.02); padding: 10px; font-family: inherit; margin-top: 20px; border-radius: 8px; }
+
+        /* STATS BAR */
+        .heat-bar { height: 8px; background: #eee; border-radius: 4px; overflow: hidden; margin-top: 5px; }
+        .heat-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #f1c40f, #e74c3c); transition: 1s; }
+
+        /* SECRET COMPARTMENT */
+        #secretPanel { max-height: 0; overflow: hidden; transition: 0.5s; background: #222; margin-top: 20px; border-radius: 8px; color: #fff; }
+        #secretPanel.open { max-height: 500px; padding: 15px; }
+        .toggle-secret { background: #333; color: #fff; text-align: center; padding: 10px; margin-top: 20px; cursor: pointer; border-radius: 8px; font-family: 'Cinzel'; }
+
+        /* NAV */
+        .nav-dock { position: fixed; bottom: 20px; display: flex; gap: 15px; background: #111; padding: 10px 20px; border-radius: 30px; border: 1px solid var(--magma); z-index: 5000; }
+        .nav-btn { background: transparent; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; transition: 0.3s; }
+        .nav-btn:hover { color: var(--ember); transform: scale(1.2); }
+
+        #imgPrev { width: 100%; border-radius: 4px; margin-top: 10px; border: 1px solid #555; }
+    </style>
+</head>
+<body onload="init()">
+
+    <div class="ember-bg" id="particles"></div>
+
+    <div class="scene">
+        <div class="book" id="book">
+            <div class="ring-binder">
+                <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+                <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+            </div>
+
+            <div class="cover" onclick="openBook()">
+                <div class="dragon-sigil"><i class="fas fa-dragon"></i></div>
+                <div class="title-text">EMBER LOG</div>
+            </div>
+
+            <div class="page" id="page">
+                <div class="header-row">
+                    <span class="burn-text" id="dateDisplay"></span>
+                    <span class="burn-text" id="percDisplay">0%</span>
+                </div>
+                <div class="heat-bar"><div class="heat-fill" id="heatFill"></div></div>
+
+                <div style="margin: 20px 0; font-family: 'Cinzel'; color:#555;">DAILY RITUALS</div>
+                <div class="habit-grid">
+                    <div class="habit-btn" id="h_fire" onclick="toggleHabit('fire')"><i class="fas fa-fire"></i></div>
+                    <div class="habit-btn" id="h_water" onclick="toggleHabit('water')"><i class="fas fa-tint"></i></div>
+                    <div class="habit-btn" id="h_book" onclick="toggleHabit('book')"><i class="fas fa-book"></i></div>
+                    <div class="habit-btn" id="h_sword" onclick="toggleHabit('sword')"><i class="fas fa-dumbbell"></i></div>
+                    <div class="habit-btn" id="h_med" onclick="toggleHabit('med')"><i class="fas fa-om"></i></div>
+                </div>
+
+                <div style="margin: 20px 0; font-family: 'Cinzel'; color:#555;">QUEST LOG</div>
+                <div id="questLog"></div>
+
+                <textarea id="notes" class="save" placeholder="Chronicle your journey..." oninput="save()"></textarea>
+
+                <div class="toggle-secret" onclick="toggleSecret()">Unlock Hidden Cache</div>
+                <div id="secretPanel">
+                    <div style="text-align: center; cursor: pointer;" onclick="document.getElementById('imgInp').click()">
+                        <i class="fas fa-camera"></i> Upload Artifact
+                        <img id="imgPrev" src="" style="display:none;">
+                    </div>
+                    <textarea id="secretNotes" class="save" style="width:100%; background: #111; color: #ddd; border:none; margin-top:10px; height:80px;" placeholder="Secret words..." oninput="save()"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="nav-dock">
+        <button class="nav-btn" onclick="turn(-1)"><i class="fas fa-chevron-left"></i></button>
+        <button class="nav-btn" onclick="closeBook()"><i class="fas fa-home"></i></button>
+        <button class="nav-btn" onclick="clearDay()"><i class="fas fa-trash"></i></button>
+        <button class="nav-btn" onclick="turn(1)"><i class="fas fa-chevron-right"></i></button>
+    </nav>
+
+    <input type="file" id="imgInp" hidden onchange="handleImg(event)">
+
+    <script>
+        let vDate = new Date(); vDate.setHours(0,0,0,0);
+        let habits = {};
+
+        function init() {
+            // Particles
+            const bg = document.getElementById('particles');
+            for(let i=0; i<30; i++){
+                let p = document.createElement('div'); p.className='particle';
+                p.style.left = Math.random()*100 + 'vw';
+                p.style.animationDuration = (Math.random()*5 + 5) + 's';
+                p.style.animationDelay = Math.random()*5 + 's';
+                bg.appendChild(p);
+            }
+
+            // Quests
+            const q = document.getElementById('questLog');
+            for(let i=1; i<=6; i++) {
+                q.innerHTML += `<div class="task-row"><input type="checkbox" id="q_${i}" class="chk-save fire-check" onclick="save()"><input type="text" id="t_${i}" class="save fire-input" placeholder="Quest ${i}..." oninput="save()"></div>`;
+            }
+            load();
+        }
+
+        function getKey(d) { return `dragon_ember_${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; }
+
+        function openBook() { document.getElementById('book').classList.add('open'); }
+        function closeBook() { save(); document.getElementById('book').classList.remove('open'); }
+
+        function turn(dir) {
+            save();
+            document.getElementById('page').classList.add('flipping');
+            setTimeout(() => {
+                vDate.setDate(vDate.getDate() + dir);
+                load();
+                document.getElementById('page').classList.remove('flipping');
+            }, 400);
+        }
+
+        function load() {
+            const data = JSON.parse(localStorage.getItem(getKey(vDate))) || {};
+            habits = data.habits || {};
+            
+            document.querySelectorAll('.save').forEach(el => el.value = data[el.id] || '');
+            document.querySelectorAll('.chk-save').forEach(el => el.checked = data[el.id] || false);
+            
+            if(data.img) {
+                document.getElementById('imgPrev').src = data.img;
+                document.getElementById('imgPrev').style.display = 'block';
+            } else {
+                document.getElementById('imgPrev').style.display = 'none';
+            }
+
+            document.getElementById('dateDisplay').innerText = vDate.toLocaleDateString();
+            updateUI();
+        }
+
+        function save() {
+            const data = { habits, img: document.getElementById('imgPrev').src };
+            document.querySelectorAll('.save').forEach(el => data[el.id] = el.value);
+            document.querySelectorAll('.chk-save').forEach(el => data[el.id] = el.checked);
+            localStorage.setItem(getKey(vDate), JSON.stringify(data));
+            updateUI();
+        }
+
+        function updateUI() {
+            ['fire','water','book','sword','med'].forEach(h => {
+                document.getElementById('h_'+h).classList.toggle('active', !!habits[h]);
+            });
+            
+            let total = 5 + 6; // 5 habits + 6 quests
+            let done = Object.values(habits).filter(x=>x).length + 
+                       Array.from(document.querySelectorAll('.chk-save')).filter(x=>x.checked).length;
+            let p = Math.round((done/total)*100);
+            document.getElementById('heatFill').style.width = p + '%';
+            document.getElementById('percDisplay').innerText = p + '%';
+        }
+
+        function toggleHabit(h) { habits[h] = !habits[h]; save(); }
+        function toggleSecret() { document.getElementById('secretPanel').classList.toggle('open'); }
+        function clearDay() { if(confirm("Burn this page?")) { localStorage.removeItem(getKey(vDate)); load(); } }
+
+        function handleImg(e) {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                document.getElementById('imgPrev').src = evt.target.result;
+                save();
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    </script>
+</body>
+</html>

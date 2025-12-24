@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Master Archive Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { 
+            --sidebar-width: 260px; 
+            --bg: #050505; 
+            --accent: #d4af37; 
+            --card-bg: #111;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            display: flex; height: 100vh; background: var(--bg); 
+            font-family: 'Segoe UI', sans-serif; overflow: hidden;
+        }
+
+        /* --- SIDEBAR (Desktop Default) --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: #0a0a0a;
+            border-right: 1px solid #222;
+            display: flex; flex-direction: column;
+            padding: 20px; z-index: 20;
+            box-shadow: 5px 0 20px rgba(0,0,0,0.5);
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+
+        .brand {
+            color: var(--accent); font-size: 1.2rem; font-weight: bold;
+            text-transform: uppercase; letter-spacing: 3px;
+            margin-bottom: 20px; text-align: center;
+            border-bottom: 1px solid #222; padding-bottom: 20px;
+        }
+
+        .menu-grid {
+            display: flex; flex-direction: column; gap: 12px;
+            overflow-y: auto; padding-right: 5px;
+        }
+
+        /* CARD STYLING */
+        .card {
+            background: var(--card-bg); border: 1px solid #333;
+            border-radius: 12px; padding: 12px 15px;
+            cursor: pointer; transition: 0.3s;
+            display: flex; align-items: center; gap: 15px;
+            position: relative; overflow: hidden;
+        }
+        .card:hover { transform: translateX(5px); border-color: var(--accent); background: #1a1a1a; }
+        .card.active { border-color: var(--accent); background: linear-gradient(90deg, #1a1a1a, #000); }
+        
+        /* Active Indicator Glow */
+        .card.active::before {
+            content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--accent);
+        }
+
+        .card-icon {
+            width: 35px; height: 35px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; background: #000; color: #fff;
+            border: 1px solid #333; flex-shrink: 0;
+        }
+
+        .card-info { flex: 1; min-width: 0; }
+        .card-info h4 { color: #eee; font-size: 0.85rem; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-info p { color: #666; font-size: 0.65rem; text-transform: uppercase; }
+
+        /* --- MAIN CONTENT AREA --- */
+        .main-view {
+            flex: 1; position: relative;
+            background-image: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+            width: 100%; height: 100%;
+        }
+
+        iframe {
+            width: 100%; height: 100%; border: none;
+            opacity: 0; transition: opacity 0.5s; display: block;
+        }
+        iframe.loaded { opacity: 1; }
+
+        /* --- COLORS --- */
+        .c1 .card-icon { color: #ffd700; box-shadow: 0 0 8px rgba(255, 215, 0, 0.2); }
+        .c2 .card-icon { color: #2ecc71; box-shadow: 0 0 8px rgba(46, 204, 113, 0.2); }
+        .c3 .card-icon { color: #ecf0f1; box-shadow: 0 0 8px rgba(236, 240, 241, 0.2); }
+        .c4 .card-icon { color: #9b59b6; box-shadow: 0 0 8px rgba(155, 89, 182, 0.2); }
+        .c5 .card-icon { color: #3498db; box-shadow: 0 0 8px rgba(52, 152, 219, 0.2); }
+        .c6 .card-icon { color: #e74c3c; box-shadow: 0 0 8px rgba(231, 76, 60, 0.2); }
+        .c7 .card-icon { color: #00f3ff; box-shadow: 0 0 8px rgba(0, 243, 255, 0.2); }
+
+        /* --- 📱 MOBILE RESPONSIVE TWEAKS --- */
+        @media (max-width: 768px) {
+            body { 
+                flex-direction: column; /* Stack vertically */
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 85px; /* Limit height */
+                padding: 10px;
+                border-right: none;
+                border-bottom: 1px solid #333;
+                background: #000;
+                flex-direction: row; /* Horizontal layout */
+                align-items: center;
+                gap: 10px;
+            }
+
+            .brand {
+                display: none; /* Hide brand to save space on mobile */
+            }
+
+            .menu-grid {
+                flex-direction: row; /* Horizontal Scroll */
+                gap: 10px;
+                padding-right: 0;
+                overflow-x: auto;
+                overflow-y: hidden;
+                width: 100%;
+                scroll-behavior: smooth;
+                -webkit-overflow-scrolling: touch; /* Smooth iOS scrolling */
+            }
+            
+            /* Hide scrollbar on mobile but allow scrolling */
+            .menu-grid::-webkit-scrollbar { display: none; }
+
+            .card {
+                min-width: 140px; /* Fixed width cards */
+                padding: 8px 10px;
+                flex-direction: row;
+                justify-content: flex-start;
+                background: #111;
+            }
+            
+            .card:hover { transform: none; } /* Disable hover move on mobile */
+            
+            .card-icon {
+                width: 30px; height: 30px; font-size: 0.9rem;
+            }
+            
+            .card-info h4 { font-size: 0.8rem; }
+            .card-info p { display: none; /* Hide description on mobile for space */ }
+
+            .main-view {
+                height: calc(100vh - 85px); /* Remaining height */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="brand">Nexus Archive</div>
+        
+        <div class="menu-grid">
+            
+            <div class="card c1 active" onclick="loadFrame(1, this)">
+                <div class="card-icon"><i class="fas fa-gem"></i></div>
+                <div class="card-info">
+                    <h4>Diamond</h4>
+                    <p>Luxury</p>
+                </div>
+            </div>
+
+            <div class="card c2" onclick="loadFrame(2, this)">
+                <div class="card-icon"><i class="fas fa-leaf"></i></div>
+                <div class="card-info">
+                    <h4>Botanical</h4>
+                    <p>Nature</p>
+                </div>
+            </div>
+
+            <div class="card c3" onclick="loadFrame(3, this)">
+                <div class="card-icon"><i class="fas fa-book"></i></div>
+                <div class="card-info">
+                    <h4>Minimal</h4>
+                    <p>Focus</p>
+                </div>
+            </div>
+
+            <div class="card c4" onclick="loadFrame(4, this)">
+                <div class="card-icon"><i class="fas fa-magic"></i></div>
+                <div class="card-info">
+                    <h4>Royal</h4>
+                    <p>Magic</p>
+                </div>
+            </div>
+
+            <div class="card c5" onclick="loadFrame(5, this)">
+                <div class="card-icon"><i class="fas fa-water"></i></div>
+                <div class="card-info">
+                    <h4>Oceanic</h4>
+                    <p>Deep</p>
+                </div>
+            </div>
+
+            <div class="card c6" onclick="loadFrame(6, this)">
+                <div class="card-icon"><i class="fas fa-fire"></i></div>
+                <div class="card-info">
+                    <h4>Dragon</h4>
+                    <p>Fire</p>
+                </div>
+            </div>
+
+            <div class="card c7" onclick="loadFrame(7, this)">
+                <div class="card-icon"><i class="fas fa-bolt"></i></div>
+                <div class="card-info">
+                    <h4>Archive 7</h4>
+                    <p>Custom</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="main-view">
+        <iframe id="contentFrame" src=""></iframe>
+    </div>
+
+    <script>
+        function loadFrame(id, element) {
+            // Update active styling
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+            element.classList.add('active');
+
+            // Scroll the selected item into view (Mobile UX)
+            element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+
+            // Load Content
+            const frame = document.getElementById('contentFrame');
+            frame.classList.remove('loaded');
+            
+            setTimeout(() => {
+                frame.src = id + ".html";
+                frame.onload = () => frame.classList.add('loaded');
+            }, 150);
+        }
+
+        // Initialize with first archive
+        window.onload = () => {
+            const firstCard = document.querySelector('.c1');
+            if(firstCard) loadFrame(1, firstCard);
+        };
+    </script>
+</body>
+</html>

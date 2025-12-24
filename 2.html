@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Botanical Spiral Archive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --leather: #3d2b1f; --paper: #fcfaf2; --ink: #2c3e50;
+            --gold: #d4af37; --floral: #8b4367; --wax: #9e2a1d;
+            --mint: #e8f8f0; --leaf: #2ecc71; --wire: #bdc3c7;
+        }
+
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; outline: none; }
+        
+        body {
+            font-family: 'Patrick Hand', cursive; 
+            background: #1a0f0a url('https://www.transparenttextures.com/patterns/dark-wood.png');
+            margin: 0; padding: 0; display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; overflow: hidden; perspective: 2000px;
+        }
+
+        /* --- 3D SCENE --- */
+        .scene { width: 90%; max-width: 450px; height: 85vh; transform-style: preserve-3d; z-index: 10; margin-top: 30px; }
+        
+        .book { 
+            position: relative; width: 100%; height: 100%; background: var(--leather); 
+            border-radius: 15px; transform-style: preserve-3d; 
+            box-shadow: 0 40px 80px rgba(0,0,0,0.8); transition: transform 0.6s; 
+        }
+
+        /* --- SPIRAL BINDING --- */
+        .spiral-binding {
+            position: absolute; top: -15px; left: 5%; width: 90%; height: 30px;
+            display: flex; justify-content: space-around; z-index: 1000; pointer-events: none;
+        }
+        .wire {
+            width: 10px; height: 40px; background: linear-gradient(to right, #7f8c8d, #ecf0f1, #7f8c8d);
+            border-radius: 10px; box-shadow: 2px 5px 10px rgba(0,0,0,0.5);
+        }
+
+        /* --- VERTICAL COVER --- */
+        .cover { 
+            position: absolute; inset: 0; background: var(--leather); border-radius: 15px; 
+            z-index: 500; transform-origin: top; transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1); 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            backface-visibility: hidden; box-shadow: inset 0 -10px 30px rgba(0,0,0,0.6); cursor: pointer; 
+        }
+        .book.open .cover { transform: rotateX(165deg); }
+
+        .plate { border: 2px solid var(--gold); padding: 30px; text-align: center; border-radius: 12px; background: rgba(0,0,0,0.1); }
+
+        /* --- VERTICAL PAGE --- */
+        .page-container { position: absolute; inset: 20px 10px 10px 10px; transform-style: preserve-3d; }
+        .page { 
+            position: absolute; inset: 0; background: var(--paper); 
+            background-image: url('https://www.transparenttextures.com/patterns/cream-pixels.png'); 
+            padding: 20px; border-radius: 5px; transform-origin: top; 
+            backface-visibility: hidden; transition: transform 0.8s; z-index: 10; overflow-y: auto;
+            border-top: 8px solid #e0e0e0;
+        }
+        .page.flipping { transform: rotateX(180deg); }
+        .page.locked { filter: sepia(0.4) contrast(1.1); pointer-events: none; }
+
+        /* UI ELEMENTS */
+        .growth-wrap { display: flex; align-items: center; gap: 10px; margin: 10px 0; }
+        .vine-bar { flex: 1; height: 10px; background: #eee; border-radius: 10px; overflow: hidden; border: 1px solid #ddd; }
+        #growthBar { width: 0%; height: 100%; background: linear-gradient(to right, var(--leaf), var(--gold)); transition: 1s; }
+
+        .habit-garden { display: flex; justify-content: space-around; padding: 12px; background: rgba(255,255,255,0.6); border-radius: 15px; border: 1px dashed var(--gold); margin: 10px 0; }
+        .badge { display: flex; flex-direction: column; align-items: center; cursor: pointer; opacity: 0.25; transition: 0.4s; }
+        .badge.active { opacity: 1; transform: scale(1.2) rotate(5deg); }
+        .badge .icon { font-size: 1.6rem; }
+
+        .time-row { display: flex; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.05); padding: 6px 0; gap: 10px; }
+        .time-label { font-size: 0.75rem; color: #999; width: 40px; font-weight: bold; }
+        .circle-check { width: 18px; height: 18px; accent-color: var(--leaf); cursor: pointer; }
+        input[type="text"], textarea { border: none; background: transparent; font-family: inherit; width: 100%; font-size: 1rem; color: var(--ink); }
+
+        /* SECRET DRAWER & PHOTO */
+        .drawer-box { margin-top: 20px; border: 1px solid #ddd; border-radius: 12px; overflow: hidden; background: white; }
+        .drawer-handle { background: var(--mint); color: var(--floral); padding: 12px; text-align: center; cursor: pointer; font-weight: bold; font-size: 0.85rem; letter-spacing: 1px; }
+        #pocket { max-height: 0; overflow: hidden; transition: 0.6s ease-in-out; background: #fff; }
+        #pocket.open { max-height: 600px; padding: 15px; border-top: 1px solid #eee; }
+        
+        .polaroid { width: 180px; height: 210px; background: white; padding: 10px 10px 40px 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); margin: 10px auto; transform: rotate(-2deg); border: 1px solid #eee; cursor: pointer; position: relative; }
+        .polaroid img { width: 100%; height: 100%; object-fit: cover; background: #f9f9f9; }
+        .polaroid::after { content: '📸 Click to add Photo'; position: absolute; bottom: 10px; left: 0; width: 100%; text-align: center; font-size: 0.7rem; color: #aaa; }
+
+        /* DASHBOARD & CALENDAR */
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 3000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal { background: var(--paper); padding: 25px; border-radius: 20px; width: 100%; max-width: 400px; box-shadow: 0 0 30px var(--gold); }
+        .big-perc { font-size: 3.5rem; color: var(--floral); margin: 10px 0; font-family: 'Playfair Display'; text-align: center; }
+
+        /* NAVIGATION */
+        .bottom-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 1000; padding: 10px 20px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border-radius: 50px; }
+        .btn { width: 46px; height: 46px; border-radius: 50%; background: #fff; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+        .btn.gold { background: var(--gold); color: white; width: 60px; height: 60px; margin-top: -30px; border: 4px solid #1a0f0a; }
+
+        #waxSeal { position: absolute; bottom: 25px; right: 25px; width: 55px; height: 55px; background: var(--wax); border-radius: 50%; color: var(--gold); display: flex; align-items: center; justify-content: center; cursor: pointer; transform: scale(0); transition: 0.5s; font-size: 1.5rem; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        #waxSeal.sealed { transform: scale(1) rotate(-10deg); }
+    </style>
+</head>
+<body onload="init()">
+
+    <div class="spiral-binding">
+        <div class="wire"></div><div class="wire"></div><div class="wire"></div>
+        <div class="wire"></div><div class="wire"></div><div class="wire"></div>
+        <div class="wire"></div><div class="wire"></div><div class="wire"></div>
+    </div>
+
+    <audio id="flipSound"><source src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" type="audio/mpeg"></audio>
+    <input type="file" id="imageInput" hidden accept="image/*" onchange="handleImage(event)">
+
+    <div class="overlay" id="dashOverlay" onclick="this.style.display='none'">
+        <div class="modal" onclick="event.stopPropagation()">
+            <h2 style="text-align:center; font-family: 'Playfair Display'; color: var(--floral);">🌸 Daily Bloom Report</h2>
+            <div class="dash-card" style="background:white; padding:20px; border-radius:15px; border-left: 5px solid var(--gold);">
+                <p id="dashDateLabel" style="margin:0; color:#888; font-weight: bold;"></p>
+                <p class="big-perc" id="dailyPerc">0%</p>
+                <div class="vine-bar"><div id="dailyFill" style="height:100%; background:var(--leaf); width:0%;"></div></div>
+                <p style="font-size: 0.75rem; color: #999; margin-top: 10px;">Calculation based on 5 habits and schedule tasks.</p>
+            </div>
+            <button onclick="document.getElementById('dashOverlay').style.display='none'" style="width:100%; padding:14px; margin-top:20px; background:var(--leather); color:white; border:none; border-radius:12px; cursor:pointer; font-weight:bold;">RETURN TO ARCHIVE</button>
+        </div>
+    </div>
+
+    <div class="overlay" id="calOverlay" onclick="this.style.display='none'">
+        <div class="modal" onclick="event.stopPropagation()">
+            <h2 style="text-align:center; font-family: 'Playfair Display';">📅 Archive Roadmap</h2>
+            <button onclick="jumpToday()" style="width:100%; padding:12px; background:var(--gold); color:white; border:none; border-radius:10px; margin-bottom:15px; font-weight:bold; cursor:pointer;">✨ JUMP TO TODAY</button>
+            <div id="roadmap" style="max-height: 40vh; overflow-y: auto; border: 1px solid #eee; border-radius: 10px;"></div>
+            <button onclick="document.getElementById('calOverlay').style.display='none'" style="width:100%; padding:10px; margin-top:15px; border:none; background:#eee; border-radius:8px;">CLOSE</button>
+        </div>
+    </div>
+
+    <div class="scene">
+        <div class="book" id="book">
+            <div class="cover" onclick="openBook()">
+                <div class="plate">
+                    <h2 id="dispName" style="color:white; margin:0; font-family: 'Playfair Display'; font-size: 1.8rem;">Botanical Archive</h2>
+                    <small style="color:var(--gold); letter-spacing:4px; font-weight:bold; text-transform:uppercase;">Spiral Vertical Edition</small>
+                </div>
+            </div>
+
+            <div class="page-container">
+                <div class="page" id="page">
+                    <h2 id="dateDisplay" style="text-align:center; color:var(--floral); margin:0; font-family: 'Playfair Display';"></h2>
+                    
+                    <div class="growth-wrap">
+                        <span>🌱</span>
+                        <div class="vine-bar"><div id="growthBar"></div></div>
+                        <span>🌸</span>
+                    </div>
+
+                    <div class="habit-garden">
+                        <div class="badge" id="b_water" onclick="hitBadge('water')"><span class="icon">💧</span></div>
+                        <div class="badge" id="b_gym" onclick="hitBadge('gym')"><span class="icon">💪</span></div>
+                        <div class="badge" id="b_read" onclick="hitBadge('read')"><span class="icon">📚</span></div>
+                        <div class="badge" id="b_sun" onclick="hitBadge('sun')"><span class="icon">☀️</span></div>
+                        <div class="badge" id="b_zen" onclick="hitBadge('zen')"><span class="icon">🧘</span></div>
+                    </div>
+
+                    <div id="sched"></div>
+
+                    <textarea id="notes" class="save" style="margin-top:15px; height:100px; border-left:3px solid var(--mint); padding-left:12px;" placeholder="What's blooming in your mind today?"></textarea>
+
+                    <div class="drawer-box">
+                        <div class="drawer-handle" onclick="toggleDrawer()">🗝️ SECRET DRAWER</div>
+                        <div id="pocket">
+                            <div class="polaroid" onclick="triggerPhoto()">
+                                <img id="photoPrev" src="https://via.placeholder.com/180x150?text=No+Photo">
+                            </div>
+                            <textarea id="secret" class="save" style="height:80px; border-bottom: 1px solid #eee;" placeholder="Confidential memories..."></textarea>
+                        </div>
+                    </div>
+
+                    <div id="waxSeal" onclick="hitSeal()">❀</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <button class="btn" onclick="turn(-1)" title="Previous Day"><i class="fas fa-chevron-up"></i></button>
+        <button class="btn" onclick="openRoadmap()" title="Calendar"><i class="fas fa-calendar-alt"></i></button>
+        <button class="btn gold" onclick="closeBook()" title="Home"><i class="fas fa-home"></i></button>
+        <button class="btn" onclick="openDash()" title="Daily Report"><i class="fas fa-chart-line"></i></button>
+        <button class="btn" onclick="wipe()" title="Reset Day"><i class="fas fa-eraser"></i></button>
+        <button class="btn" onclick="turn(1)" title="Next Day"><i class="fas fa-chevron-down"></i></button>
+    </nav>
+
+<script>
+    let viewDate = new Date();
+    viewDate.setHours(0,0,0,0);
+    let stickers = {}, flipping = false, sealed = false;
+
+    function init() {
+        const s = document.getElementById('sched');
+        s.innerHTML = '';
+        // Create 11 schedule items (8 AM to 6 PM)
+        for(let h=8; h<=18; h++) {
+            s.innerHTML += `
+                <div class="time-row">
+                    <span class="time-label">${h}:00</span>
+                    <input type="checkbox" id="chk_${h}" class="save-check circle-check" onclick="save()">
+                    <input type="text" id="t_${h}" class="save" placeholder="Plan your hour...">
+                </div>`;
+        }
+        if(localStorage.getItem('arch_name')) document.getElementById('dispName').innerText = localStorage.getItem('arch_name');
+        load();
+    }
+
+    function getDateKey(date) {
+        return `botanical_spiral_${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
+    }
+
+    function openBook() {
+        if(!localStorage.getItem('arch_name')){
+            let n = prompt("Archive Owner Name:"); 
+            if(n) {
+                localStorage.setItem('arch_name', n);
+                document.getElementById('dispName').innerText = n;
+            }
+        }
+        document.getElementById('book').classList.add('open');
+        document.getElementById('flipSound').play().catch(()=>{});
+    }
+
+    function closeBook() { 
+        save(); 
+        document.getElementById('book').classList.remove('open'); 
+        document.getElementById('flipSound').play().catch(()=>{});
+    }
+
+    function turn(offset) {
+        if(flipping) return; 
+        flipping = true; 
+        save();
+        document.getElementById('flipSound').play().catch(()=>{});
+        const p = document.getElementById('page'); 
+        p.classList.add('flipping');
+        
+        setTimeout(() => {
+            viewDate.setDate(viewDate.getDate() + offset);
+            viewDate.setHours(0,0,0,0);
+            load();
+            p.style.transition = 'none'; 
+            p.style.transform = 'rotateX(0deg)';
+            p.offsetHeight; 
+            p.style.transition = ''; 
+            p.classList.remove('flipping');
+            flipping = false;
+        }, 600);
+    }
+
+    function load() {
+        const key = getDateKey(viewDate);
+        const data = JSON.parse(localStorage.getItem(key)) || {};
+        sealed = data.sealed || false; 
+        stickers = data.stickers || {};
+        
+        // Load text inputs
+        document.querySelectorAll('.save').forEach(el => { 
+            el.value = data[el.id] || ''; 
+            el.disabled = sealed; 
+        });
+        
+        // Load checkboxes
+        document.querySelectorAll('.save-check').forEach(el => { 
+            el.checked = data[el.id] || false; 
+            el.disabled = sealed; 
+        });
+        
+        // Load Photo
+        document.getElementById('photoPrev').src = data.photo || 'https://via.placeholder.com/180x150?text=No+Photo';
+        
+        // UI States
+        document.getElementById('waxSeal').classList.toggle('sealed', sealed);
+        document.getElementById('page').classList.toggle('locked', sealed);
+        document.getElementById('dateDisplay').innerText = viewDate.toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'});
+        
+        updateUI(); 
+        updateGrowth();
+    }
+
+    function save() {
+        const key = getDateKey(viewDate);
+        const data = { 
+            stickers, 
+            sealed, 
+            photo: document.getElementById('photoPrev').src 
+        };
+        document.querySelectorAll('.save').forEach(el => data[el.id] = el.value);
+        document.querySelectorAll('.save-check').forEach(el => data[el.id] = el.checked);
+        localStorage.setItem(key, JSON.stringify(data));
+        updateGrowth();
+    }
+
+    function updateGrowth() {
+        let habitPoints = Object.values(stickers).filter(v => v).length;
+        let schedulePoints = Array.from(document.querySelectorAll('.save-check')).filter(x => x.checked).length;
+        // Total points: 5 habits + 11 schedule items = 16
+        let perc = Math.round(((habitPoints + schedulePoints) / 16) * 100);
+        document.getElementById('growthBar').style.width = perc + '%';
+        return perc;
+    }
+
+    function hitBadge(id) { 
+        if(!sealed) { 
+            stickers[id] = !stickers[id]; 
+            updateUI(); 
+            save(); 
+        } 
+    }
+
+    function updateUI() { 
+        ['water','gym','read','sun','zen'].forEach(id => {
+            document.getElementById('b_'+id).classList.toggle('active', !!stickers[id]);
+        });
+    }
+
+    function hitSeal() { sealed = !sealed; save(); load(); }
+    
+    function toggleDrawer() { 
+        document.getElementById('pocket').classList.toggle('open'); 
+    }
+
+    function triggerPhoto() {
+        if(!sealed) document.getElementById('imageInput').click();
+    }
+
+    function handleImage(e) {
+        let reader = new FileReader();
+        reader.onload = function(){
+            document.getElementById('photoPrev').src = reader.result;
+            save();
+        }
+        reader.readAsDataURL(e.target.files[0]);
+    }
+
+    function openRoadmap() {
+        const rm = document.getElementById('roadmap'); 
+        rm.innerHTML = '';
+        // Show recent 10 days in calendar
+        for(let d=-5; d<=5; d++) {
+            let temp = new Date(); 
+            temp.setDate(temp.getDate() + d);
+            rm.innerHTML += `
+                <div class="time-row" onclick="jumpToDate(${temp.getTime()})" style="cursor:pointer; padding:12px; background:white;">
+                    📅 ${temp.toLocaleDateString()}
+                </div>`;
+        }
+        document.getElementById('calOverlay').style.display = 'flex';
+    }
+
+    function jumpToDate(ts) { 
+        viewDate = new Date(ts); 
+        viewDate.setHours(0,0,0,0);
+        load(); 
+        document.getElementById('calOverlay').style.display = 'none'; 
+    }
+
+    function jumpToday() { 
+        viewDate = new Date(); 
+        viewDate.setHours(0,0,0,0); 
+        load(); 
+        document.getElementById('calOverlay').style.display = 'none'; 
+    }
+
+    function openDash() {
+        const p = updateGrowth();
+        document.getElementById('dashDateLabel').innerText = viewDate.toDateString();
+        document.getElementById('dailyPerc').innerText = p + "%";
+        document.getElementById('dailyFill').style.width = p + "%";
+        document.getElementById('dashOverlay').style.display = 'flex';
+    }
+
+    function wipe() {
+        if(!sealed && confirm("Are you sure you want to erase this day's archive?")) {
+            localStorage.removeItem(getDateKey(viewDate));
+            load();
+        }
+    }
+
+    init();
+</script>
+</body>
+</html>
