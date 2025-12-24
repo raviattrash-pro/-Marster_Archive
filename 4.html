@@ -20,26 +20,54 @@
             background: #050505 radial-gradient(circle at center, #0a1b33 0%, #050505 100%);
             margin: 0; padding: 0; display: flex; justify-content: center; align-items: center;
             min-height: 100vh; overflow: hidden; perspective: 1500px;
-            touch-action: none;
+            touch-action: pan-y; 
         }
 
         /* --- MAGIC AMBIENCE --- */
         .sparkle { position: absolute; background: var(--gold); border-radius: 50%; opacity: 0.4; pointer-events: none; z-index: 1; animation: rise 10s infinite linear; }
         @keyframes rise { 0% { transform: translateY(100vh) scale(0); opacity: 0; } 50% { opacity: 0.5; } 100% { transform: translateY(-10vh) scale(1.5); opacity: 0; } }
 
-        /* --- ROYAL SPIRAL BINDING --- */
-        .spiral-rail {
-            position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
-            width: 85%; max-width: 400px; display: flex; justify-content: space-around; z-index: 2000;
+        /* --- 3D BOOK CONTAINER --- */
+        .scene { 
+            width: 94%; max-width: 440px; 
+            height: 75vh; 
+            transform-style: preserve-3d; 
+            /* Increased Gap between book and buttons */
+            margin-bottom: 180px; 
+            position: relative;
         }
-        .wire {
-            width: 12px; height: 38px; background: linear-gradient(90deg, #111, #eee, #111);
-            border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.8);
+        .book { 
+            position: relative; width: 100%; height: 100%; 
+            background: var(--navy); border-radius: 20px; 
+            transform-style: preserve-3d; 
+            box-shadow: 0 60px 150px rgba(0,0,0,1); 
+            transition: transform 0.1s ease-out; 
         }
 
-        /* --- 3D BOOK CONTAINER --- */
-        .scene { width: 94%; max-width: 440px; height: 84vh; transform-style: preserve-3d; margin-bottom: 50px; }
-        .book { position: relative; width: 100%; height: 100%; background: var(--navy); border-radius: 20px; transform-style: preserve-3d; box-shadow: 0 60px 150px rgba(0,0,0,1); transition: transform 0.1s ease-out; }
+        /* --- IMPROVED GOLDEN SPIRAL --- */
+        .spiral-rail {
+            position: absolute; top: -25px; left: 15px; 
+            width: calc(100% - 30px); height: 50px;
+            display: flex; justify-content: space-between; 
+            z-index: 2000; pointer-events: none;
+        }
+        .ring-group {
+            display: flex; flex-direction: column; align-items: center; width: 25px;
+        }
+        .ring {
+            width: 14px; height: 50px; 
+            /* Realistic Gold Gradient */
+            background: linear-gradient(90deg, #8a6e2f, #ffd700, #fff, #ffd700, #8a6e2f);
+            border-radius: 8px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.8);
+            transform: rotate(-4deg);
+        }
+        .hole {
+            width: 14px; height: 14px; background: #000; border-radius: 50%;
+            margin-top: -10px; /* Tucks underneath the ring */
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.3);
+            z-index: -1;
+        }
 
         /* --- INTERACTIVE PARALLAX COVER --- */
         .cover { 
@@ -68,10 +96,14 @@
         .page-container { position: absolute; inset: 10px; transform-style: preserve-3d; }
         .page { 
             position: absolute; inset: 0; background: var(--paper); 
-            padding: 25px; border-radius: 8px; transform-origin: top; 
-            backface-visibility: hidden; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); z-index: 10; overflow-y: auto;
+            padding: 30px 25px 25px 25px; 
+            border-radius: 8px; transform-origin: top; 
+            backface-visibility: hidden; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); z-index: 10; 
+            overflow-y: auto; 
+            -webkit-overflow-scrolling: touch;
             border: 1px solid #e0d0b0;
             box-shadow: inset 0 0 80px rgba(197, 160, 89, 0.1);
+            touch-action: pan-y;
         }
         .page.flipping { transform: rotateX(180deg) scale(1.02); filter: brightness(0.9); }
         .page.locked { filter: sepia(0.5) contrast(0.85); pointer-events: none; }
@@ -105,10 +137,34 @@
         .polaroid-royal img { width: 100%; min-height: 200px; object-fit: cover; border-radius: 2px; }
 
         /* --- NAV DOCK --- */
-        .nav-dock { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; background: rgba(0,0,0,0.9); backdrop-filter: blur(25px); padding: 12px 25px; border-radius: 80px; z-index: 5000; border: 2px solid var(--gold); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .nav-btn { width: 50px; height: 50px; border-radius: 50%; background: #fff; border: none; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer; font-size: 1.3rem; transition: 0.3s; }
+        .nav-dock { 
+            position: fixed; 
+            bottom: 50px; /* Positioned carefully to not overlap */
+            left: 50%; transform: translateX(-50%); 
+            display: flex; align-items: center; 
+            gap: 15px; 
+            background: rgba(0,0,0,0.9); 
+            backdrop-filter: blur(25px); padding: 12px 25px; 
+            border-radius: 80px; z-index: 5000; border: 2px solid var(--gold); 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
+        }
+        
+        .nav-btn { 
+            width: 50px; height: 50px; border-radius: 50%; 
+            background: #fff; border: none; 
+            display: flex; align-items: center; justify-content: center; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); 
+            cursor: pointer; font-size: 1.3rem; transition: 0.3s; 
+        }
         .nav-btn:hover { transform: scale(1.1); background: var(--paper); }
-        .nav-btn.main { width: 72px; height: 72px; background: var(--gold); color: white; transform: translateY(-30px); border: 4px solid var(--navy); font-size: 1.8rem; }
+        
+        .nav-btn.main { 
+            width: 60px; height: 60px; 
+            background: var(--gold); color: white; 
+            border: 4px solid var(--navy); 
+            font-size: 1.8rem; 
+        }
+        .nav-btn.main:hover { transform: scale(1.1); }
 
         /* --- MODALS --- */
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 6000; display: none; align-items: center; justify-content: center; padding: 20px; }
@@ -121,34 +177,21 @@
 <body onload="init()">
 
     <div id="ambient"></div>
-    <div class="spiral-rail">
-        <div class="wire"></div><div class="wire"></div><div class="wire"></div><div class="wire"></div>
-        <div class="wire"></div><div class="wire"></div><div class="wire"></div><div class="wire"></div>
-    </div>
-
-    <audio id="flipSound"><source src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" type="audio/mpeg"></audio>
-    <input type="file" id="imgInp" hidden accept="image/*" onchange="processImg(event)">
-
-    <div class="overlay" id="calOverlay" onclick="this.style.display='none'">
-        <div class="modal" onclick="event.stopPropagation()">
-            <h2 style="font-family: 'Playfair Display'; color: var(--gold);">⚜ Archive Map ⚜</h2>
-            <button onclick="jumpToday()" style="width:100%; padding:16px; background:var(--gold); border:none; color:white; border-radius:15px; font-weight:bold; margin-bottom:25px; cursor:pointer; font-size: 1rem;">✨ BACK TO TODAY ✨</button>
-            <div id="calGrid" style="display:grid; grid-template-columns: repeat(7, 1fr); gap: 10px;"></div>
-        </div>
-    </div>
-
-    <div class="overlay" id="reportOverlay" onclick="this.style.display='none'">
-        <div class="modal" onclick="event.stopPropagation()">
-            <h2 style="font-family: 'Playfair Display'; color: var(--gold);">👑 ROYAL BLOOM 👑</h2>
-            <div style="font-size: 6rem; font-weight: 900; color: var(--leaf); text-shadow: 0 5px 15px rgba(0,0,0,0.1);" id="reportPerc">0%</div>
-            <div class="growth-meter"><div id="reportFill" style="height:100%; background:var(--gold); width:0%;"></div></div>
-            <p id="quote" style="font-style: italic; color: #555; margin-top: 25px; font-size: 1.2rem;"></p>
-            <button onclick="document.getElementById('reportOverlay').style.display='none'" style="width:100%; padding:16px; margin-top:30px; background:var(--navy); color:white; border-radius:15px; border:none; font-weight:bold; cursor:pointer;">👑 CONTINUE REIGN 👑</button>
-        </div>
-    </div>
-
+    
     <div class="scene">
         <div class="book" id="book" onmousemove="handleMove(event)" onmouseleave="resetMove()">
+            
+            <div class="spiral-rail">
+                <div class="ring-group"><div class="ring"></div><div class="hole"></div></div>
+                <div class="ring-group"><div class="ring"></div><div class="hole"></div></div>
+                <div class="ring-group"><div class="ring"></div><div class="hole"></div></div>
+                <div class="ring-group"><div class="ring"></div><div class="hole"></div></div>
+                <div class="ring-group"><div class="ring"></div><div class="hole"></div></div>
+                <div class="ring-group"><div class="ring"></div><div class="hole"></div></div>
+                <div class="ring-group"><div class="ring"></div><div class="hole"></div></div>
+                <div class="ring-group"><div class="ring"></div><div class="hole"></div></div>
+            </div>
+
             <div class="cover" onclick="openBook()">
                 <div class="cover-bg"></div>
                 <div class="floating-text" id="succ-bg">SUCCESS</div>
@@ -198,6 +241,27 @@
         </div>
     </div>
 
+    <audio id="flipSound"><source src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" type="audio/mpeg"></audio>
+    <input type="file" id="imgInp" hidden accept="image/*" onchange="processImg(event)">
+
+    <div class="overlay" id="calOverlay" onclick="this.style.display='none'">
+        <div class="modal" onclick="event.stopPropagation()">
+            <h2 style="font-family: 'Playfair Display'; color: var(--gold);">⚜ Archive Map ⚜</h2>
+            <button onclick="jumpToday()" style="width:100%; padding:16px; background:var(--gold); border:none; color:white; border-radius:15px; font-weight:bold; margin-bottom:25px; cursor:pointer; font-size: 1rem;">✨ BACK TO TODAY ✨</button>
+            <div id="calGrid" style="display:grid; grid-template-columns: repeat(7, 1fr); gap: 10px;"></div>
+        </div>
+    </div>
+
+    <div class="overlay" id="reportOverlay" onclick="this.style.display='none'">
+        <div class="modal" onclick="event.stopPropagation()">
+            <h2 style="font-family: 'Playfair Display'; color: var(--gold);">👑 ROYAL BLOOM 👑</h2>
+            <div style="font-size: 6rem; font-weight: 900; color: var(--leaf); text-shadow: 0 5px 15px rgba(0,0,0,0.1);" id="reportPerc">0%</div>
+            <div class="growth-meter"><div id="reportFill" style="height:100%; background:var(--gold); width:0%;"></div></div>
+            <p id="quote" style="font-style: italic; color: #555; margin-top: 25px; font-size: 1.2rem;"></p>
+            <button onclick="document.getElementById('reportOverlay').style.display='none'" style="width:100%; padding:16px; margin-top:30px; background:var(--navy); color:white; border-radius:15px; border:none; font-weight:bold; cursor:pointer;">👑 CONTINUE REIGN 👑</button>
+        </div>
+    </div>
+
     <nav class="nav-dock">
         <button class="nav-btn" onclick="openCal()" title="Calendar">📅</button>
         <button class="nav-btn main" onclick="closeBook()" title="Home">👑</button>
@@ -212,6 +276,8 @@
     let habits = {};
     const LOCAL_PLACEHOLDER = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='350' height='300'%3E%3Crect width='350' height='300' fill='%23f9f9f9'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='serif' font-size='20' fill='%23c5a059'%3E⚜ Tap to Attach Memory ⚜%3C/text%3E%3C/svg%3E";
 
+    // --- IMPROVED SWIPE LISTENERS ---
+    let touchStartX = 0;
     let touchStartY = 0;
 
     function init() {
@@ -235,11 +301,24 @@
         }
 
         const swipeArea = document.getElementById('swipeArea');
-        swipeArea.addEventListener('touchstart', e => { touchStartY = e.changedTouches[0].screenY; }, false);
+        
+        swipeArea.addEventListener('touchstart', e => { 
+            touchStartX = e.changedTouches[0].screenX; 
+            touchStartY = e.changedTouches[0].screenY;
+        }, { passive: true });
+
         swipeArea.addEventListener('touchend', e => { 
+            let touchEndX = e.changedTouches[0].screenX;
             let touchEndY = e.changedTouches[0].screenY;
-            if (touchStartY - touchEndY > 60) turn(1);
-            if (touchEndY - touchStartY > 60) turn(-1);
+            
+            let diffX = touchStartX - touchEndX;
+            let diffY = touchStartY - touchEndY;
+
+            // SCROLL GUARD
+            if (Math.abs(diffX) > 60 && Math.abs(diffX) > Math.abs(diffY)) {
+                if (diffX > 0) turn(1); // Swipe Left -> Next
+                else turn(-1);          // Swipe Right -> Prev
+            }
         }, false);
 
         load();
