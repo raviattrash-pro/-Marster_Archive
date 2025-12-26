@@ -19,7 +19,7 @@
             font-family: 'Segoe UI', sans-serif; overflow: hidden;
         }
 
-        /* --- SIDEBAR (Desktop Default) --- */
+        /* --- SIDEBAR --- */
         .sidebar {
             width: var(--sidebar-width);
             background: #0a0a0a;
@@ -89,10 +89,11 @@
         .c5 .card-icon { color: #3498db; box-shadow: 0 0 8px rgba(52, 152, 219, 0.2); }
         .c6 .card-icon { color: #e74c3c; box-shadow: 0 0 8px rgba(231, 76, 60, 0.2); }
         .c7 .card-icon { color: #00f3ff; box-shadow: 0 0 8px rgba(0, 243, 255, 0.2); }
-        /* NEW Planner Color */
         .c8 .card-icon { color: #f1c40f; box-shadow: 0 0 8px rgba(241, 196, 15, 0.2); }
+        /* NEW GlassyBoard Color */
+        .c9 .card-icon { color: #ff6b6b; box-shadow: 0 0 8px rgba(255, 107, 107, 0.2); }
 
-        /* --- 📱 MOBILE RESPONSIVE TWEAKS --- */
+        /* --- 📱 MOBILE RESPONSIVE --- */
         @media (max-width: 768px) {
             body { flex-direction: column; }
 
@@ -171,6 +172,11 @@
                 <div class="card-info"><h4>Daily Plan</h4><p>Productivity</p></div>
             </div>
 
+            <div class="card c9" onclick="loadFrame(9, this)">
+                <div class="card-icon"><i class="fas fa-sticky-note"></i></div>
+                <div class="card-info"><h4>GlassyBoard</h4><p>Notes</p></div>
+            </div>
+
         </div>
     </div>
 
@@ -188,7 +194,6 @@
             frame.classList.remove('loaded');
             
             setTimeout(() => {
-                // This will look for 1.html, 2.html ... 8.html
                 frame.src = id + ".html";
                 frame.onload = () => frame.classList.add('loaded');
             }, 150);
