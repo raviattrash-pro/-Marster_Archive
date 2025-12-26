@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aether Planner | Ultimate 3D</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Caveat:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            /* --- DEFAULT VARIABLES --- */
+            --bg-grad: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+            --accent: #6c5ce7;
+            --accent-glow: rgba(108, 92, 231, 0.6);
+            --text-main: #2d3436;
+            --text-mute: #636e72;
+            
+            /* --- 3D HYPER-GLASS ENGINE --- */
+            --glass-panel: rgba(255, 255, 255, 0.35);
+            --glass-card: rgba(255, 255, 255, 0.45);
+            --glass-input: rgba(255, 255, 255, 0.3);
+            
+            --border-light: rgba(255, 255, 255, 0.9);
+            --border-shadow: rgba(0, 0, 0, 0.1);
+            
+            --shadow-float: 0 20px 50px rgba(0,0,0,0.15), 0 10px 20px rgba(0,0,0,0.1);
+            --shadow-card: 10px 10px 20px rgba(0,0,0,0.08), -5px -5px 15px rgba(255,255,255,0.9), inset 0 0 0 1px rgba(255,255,255,0.4);
+            --input-carve: inset 4px 4px 8px rgba(0,0,0,0.08), inset -2px -2px 5px rgba(255,255,255,0.8);
+            
+            --blur: 40px;
+        }
+
+        /* --- THEME ENGINE --- */
+        body.theme-sunset { --bg-grad: linear-gradient(120deg, #f6d365 0%, #fda085 100%); --accent: #d35400; }
+        body.theme-ocean { --bg-grad: linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%); --accent: #0984e3; }
+        body.theme-forest { --bg-grad: linear-gradient(120deg, #d4fc79 0%, #96e6a1 100%); --accent: #009432; }
+        body.theme-midnight { 
+            --bg-grad: linear-gradient(to top, #09203f 0%, #537895 100%); 
+            --accent: #00f2ff; 
+            --text-main: #f1f2f6; --text-mute: #ced6e0;
+            --glass-panel: rgba(0,0,0,0.3); --glass-card: rgba(255,255,255,0.05); --glass-input: rgba(0,0,0,0.3);
+            --border-light: rgba(255,255,255,0.2); --border-shadow: rgba(0,0,0,0.3);
+            --shadow-card: 10px 10px 30px rgba(0,0,0,0.4), inset 1px 1px 0 rgba(255,255,255,0.1);
+            --input-carve: inset 3px 3px 8px rgba(0,0,0,0.6);
+        }
+        body.theme-nebula { --bg-grad: linear-gradient(135deg, #667eea 0%, #764ba2 100%); --accent: #a29bfe; --text-main: #fff; }
+        body.theme-cherry { --bg-grad: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); --accent: #e84393; }
+        body.theme-mint { --bg-grad: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); --accent: #00cec9; }
+        body.theme-gold { --bg-grad: linear-gradient(135deg, #e6b980 0%, #eacda3 100%); --accent: #b33939; }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; transition: background 0.6s ease, border 0.3s ease, box-shadow 0.3s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            margin: 0; padding: 0;
+            min-height: 100vh;
+            background: var(--bg-grad);
+            background-size: 400% 400%;
+            animation: gradientBG 30s ease infinite;
+            display: flex; justify-content: center; align-items: flex-start;
+            color: var(--text-main);
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        /* Floating Orbs */
+        .orb { position: fixed; border-radius: 50%; filter: blur(100px); z-index: -1; animation: float 15s infinite ease-in-out alternate; opacity: 0.6; mix-blend-mode: overlay; }
+        .orb-1 { top: -10%; left: -10%; width: 600px; height: 600px; background: white; }
+        .orb-2 { bottom: -10%; right: -10%; width: 500px; height: 500px; background: var(--accent); }
+        @keyframes float { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, 40px); } }
+
+        /* --- 3D PANEL --- */
+        .glass-panel {
+            width: 96%; max-width: 1300px;
+            margin-top: 30px;
+            background: var(--glass-panel);
+            backdrop-filter: blur(var(--blur)) saturate(160%);
+            -webkit-backdrop-filter: blur(var(--blur)) saturate(160%);
+            border-top: 1px solid var(--border-light);
+            border-left: 1px solid var(--border-light);
+            border-bottom: 1px solid var(--border-shadow);
+            border-right: 1px solid var(--border-shadow);
+            border-radius: 35px;
+            box-shadow: var(--shadow-float);
+            padding: 35px;
+            display: flex; flex-direction: column; gap: 30px;
+            animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- HEADER --- */
+        header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            flex-wrap: wrap; gap: 20px; padding-bottom: 20px; 
+            border-bottom: 1px solid var(--border-shadow); 
+        }
+        
+        .title-block h1 { font-size: 2.2rem; margin: 0; font-weight: 800; letter-spacing: -1px; text-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .title-block span { font-family: 'Caveat', cursive; font-size: 1.6rem; color: var(--accent); font-weight: 600; }
+
+        .header-controls { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+
+        .palette-scroller {
+            max-width: 300px; overflow-x: auto; white-space: nowrap;
+            padding: 8px 12px; background: var(--glass-input); border-radius: 30px;
+            box-shadow: var(--input-carve); display: flex; gap: 10px;
+        }
+        .palette-scroller::-webkit-scrollbar { display: none; }
+        
+        .color-dot {
+            width: 24px; height: 24px; border-radius: 50%; cursor: pointer; flex-shrink: 0;
+            border: 2px solid rgba(255,255,255,0.5); transition: transform 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .color-dot:hover { transform: scale(1.3) translateY(-2px); }
+        
+        /* Theme Gradients */
+        .t-sunset { background: linear-gradient(135deg, #f6d365, #fda085); }
+        .t-ocean { background: linear-gradient(135deg, #89f7fe, #66a6ff); }
+        .t-forest { background: linear-gradient(135deg, #d4fc79, #96e6a1); }
+        .t-midnight { background: linear-gradient(135deg, #09203f, #537895); }
+        .t-nebula { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .t-cherry { background: linear-gradient(135deg, #ff9a9e, #fecfef); }
+        .t-mint { background: linear-gradient(135deg, #84fab0, #8fd3f4); }
+        .t-gold { background: linear-gradient(135deg, #e6b980, #eacda3); }
+
+        .date-nav-group {
+            display: flex; align-items: center; gap: 5px;
+            background: var(--glass-card); padding: 5px 10px; border-radius: 20px;
+            border: 1px solid var(--border-light); box-shadow: var(--shadow-card);
+        }
+        .nav-btn {
+            background: transparent; border: none; color: var(--text-main); font-size: 1.1rem;
+            cursor: pointer; padding: 0; border-radius: 50%; transition: 0.3s;
+            width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+        }
+        .nav-btn:hover { background: var(--accent); color: white; transform: scale(1.15); }
+        .date-display {
+            font-weight: 700; font-size: 1rem; text-align: center;
+            background: transparent; border: none; color: var(--text-main);
+            font-family: inherit; width: 130px; cursor: pointer;
+        }
+
+        /* --- GRID & CARDS --- */
+        .grid-layout { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; }
+        @media (max-width: 1100px) { .grid-layout { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 768px) { 
+            .grid-layout { grid-template-columns: 1fr; } 
+            .glass-panel { padding: 20px; width: 98%; margin-top: 10px; }
+            header { flex-direction: column; align-items: stretch; }
+            .header-controls { flex-direction: column-reverse; width: 100%; }
+            .palette-scroller { width: 100%; justify-content: center; }
+            .date-nav-group { width: 100%; justify-content: space-between; }
+            .date-display { flex-grow: 1; }
+        }
+
+        .section-card {
+            background: var(--glass-card);
+            background-image: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 40%);
+            border-radius: 24px; padding: 25px; 
+            border: 1px solid var(--border-light); border-bottom-color: var(--border-shadow); border-right-color: var(--border-shadow);
+            box-shadow: var(--shadow-card);
+            display: flex; flex-direction: column; gap: 15px;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+        }
+        .section-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 25px 50px rgba(0,0,0,0.1), var(--shadow-card); z-index: 2; }
+
+        .section-title {
+            font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;
+            font-weight: 800; color: var(--text-mute); margin-bottom: 5px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .section-title i { color: var(--accent); font-size: 1.1rem; filter: drop-shadow(0 0 8px var(--accent)); }
+
+        input[type="text"], input[type="number"], textarea {
+            width: 100%; background: var(--glass-input); border: none;
+            padding: 15px 18px; border-radius: 16px; color: var(--text-main);
+            font-family: inherit; font-size: 1rem; font-weight: 500;
+            box-shadow: var(--input-carve); transition: 0.3s;
+        }
+        input:focus, textarea:focus { background: rgba(255,255,255,0.2); box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05), 0 0 0 2px var(--accent); }
+
+        /* --- MOOD FIX --- */
+        .moods { display: flex; gap: 10px; justify-content: space-between; }
+        .mood { 
+            font-size: 1.8rem; opacity: 0.5; filter: grayscale(1); cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); user-select: none;
+        }
+        .mood:hover { transform: scale(1.3); opacity: 0.8; }
+        .mood.active { 
+            opacity: 1; filter: grayscale(0); transform: scale(1.4) translateY(-5px); 
+            text-shadow: 0 0 20px var(--accent); 
+        }
+
+        /* --- OTHER WIDGETS --- */
+        .progress-wrapper {
+            width: 100%; background: var(--glass-card); border-radius: 20px;
+            padding: 20px 25px; border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: 10px;
+        }
+        .progress-bar-bg { width: 100%; height: 12px; background: rgba(0,0,0,0.1); border-radius: 20px; overflow: hidden; box-shadow: var(--input-carve); }
+        .progress-bar-fill { height: 100%; width: 0%; background: var(--accent); border-radius: 20px; box-shadow: 0 0 20px var(--accent); transition: width 1s ease; }
+
+        .breath-section {
+            width: 100%; background: var(--glass-card);
+            border-radius: 20px; padding: 20px 25px; border: 1px solid var(--border-light);
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: var(--shadow-card); cursor: pointer;
+        }
+        .breath-circle {
+            width: 55px; height: 55px; border-radius: 50%;
+            background: var(--glass-input); border: 2px solid var(--accent);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.6rem; font-weight: 800; color: var(--accent);
+            transition: 4s ease-in-out; box-shadow: 0 0 15px var(--accent);
+        }
+        .breath-circle.inhale { transform: scale(1.5); background: var(--accent); color: white; border-color: transparent; box-shadow: 0 0 50px var(--accent); }
+
+        .btn-small { 
+            background: var(--glass-card); color: var(--accent); border: 1px solid var(--accent); 
+            padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: 700;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: 0.3s;
+        }
+        .btn-small:hover { background: var(--accent); color: white; transform: translateY(-3px); box-shadow: 0 8px 20px var(--accent); }
+
+        .habit-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+        .habit-circle {
+            width: 32px; height: 32px; border-radius: 50%; 
+            background: var(--glass-input); box-shadow: var(--input-carve);
+            cursor: pointer; transition: 0.4s; border: 1px solid transparent;
+        }
+        .habit-circle:hover { border-color: var(--accent); transform: scale(1.1); }
+        .habit-circle.active { background: var(--accent); box-shadow: 0 0 15px var(--accent); transform: scale(1.15) rotate(180deg); }
+
+        .water-drops { display: flex; gap: 8px; }
+        .drop { font-size: 1.3rem; color: var(--text-mute); opacity: 0.3; cursor: pointer; transition: 0.4s; }
+        .drop.active { color: #00d2d3; opacity: 1; filter: drop-shadow(0 0 10px #00d2d3); transform: scale(1.2); }
+
+        .play-btn-round {
+            width: 55px; height: 55px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), #a29bfe); 
+            color: white; border: none; font-size: 1.2rem; cursor: pointer; 
+            box-shadow: 0 10px 25px var(--accent); transition: 0.4s;
+        }
+        .play-btn-round.playing { animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 var(--accent); } 70% { box-shadow: 0 0 0 15px rgba(0,0,0,0); } 100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); } }
+
+        .custom-checkbox {
+            min-width: 24px; width: 24px; height: 24px; border-radius: 8px; 
+            background: var(--glass-input); box-shadow: var(--input-carve); cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; border: 1px solid transparent;
+        }
+        .custom-checkbox.checked { background: var(--accent); box-shadow: 0 0 15px var(--accent); }
+        .custom-checkbox i { color: white; font-size: 10px; transform: scale(0); transition: 0.2s; }
+        .custom-checkbox.checked i { transform: scale(1); }
+        .todo-input.completed { text-decoration: line-through; opacity: 0.6; }
+
+        .voice-btn { position: absolute; right: 12px; bottom: 12px; background: transparent; border: none; color: var(--text-mute); cursor: pointer; font-size: 1.2rem; }
+        .voice-btn.listening { color: #ff7675; animation: pulse 1s infinite; }
+
+        .schedule-box { max-height: 250px; overflow-y: auto; padding-right: 5px; }
+        .expense-list { max-height: 120px; overflow-y: auto; margin-top: 15px; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; opacity: 0.5; }
+    </style>
+</head>
+<body class="theme-sunset">
+
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="glass-panel">
+        <header>
+            <div class="title-block">
+                <h1>Aether Planner</h1>
+                <span id="greeting">Design Your Day</span>
+            </div>
+            
+            <div class="header-controls">
+                <div class="palette-scroller">
+                    <div class="color-dot t-sunset" onclick="setTheme('theme-sunset')"></div>
+                    <div class="color-dot t-ocean" onclick="setTheme('theme-ocean')"></div>
+                    <div class="color-dot t-forest" onclick="setTheme('theme-forest')"></div>
+                    <div class="color-dot t-midnight" onclick="setTheme('theme-midnight')"></div>
+                    <div class="color-dot t-nebula" onclick="setTheme('theme-nebula')"></div>
+                    <div class="color-dot t-cherry" onclick="setTheme('theme-cherry')"></div>
+                    <div class="color-dot t-mint" onclick="setTheme('theme-mint')"></div>
+                    <div class="color-dot t-gold" onclick="setTheme('theme-gold')"></div>
+                </div>
+
+                <div class="date-nav-group">
+                    <button class="nav-btn delete-btn" onclick="clearData()" title="Reset Day"><i class="fas fa-trash-alt"></i></button>
+                    <div style="width:1px; height:15px; background:var(--text-mute); opacity:0.3;"></div>
+                    <button class="nav-btn" onclick="changeDate(-1)"><i class="fas fa-chevron-left"></i></button>
+                    <input type="date" class="date-display" id="dateInput" onchange="dateChanged()">
+                    <button class="nav-btn" onclick="changeDate(1)"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </header>
+
+        <div class="progress-wrapper">
+            <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                <span style="font-weight:800; color:var(--text-mute); font-size:0.75rem; letter-spacing:2px;">DAILY PROGRESS</span>
+                <span id="progressPercent" style="font-weight:300; color:var(--text-main); font-size:1.5rem;">0%</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progressBar"></div>
+            </div>
+        </div>
+
+        <div class="breath-section" onclick="toggleBreath(this)">
+            <div class="breath-content">
+                <h3>Zen Breath 🌬️</h3>
+                <p>Sync your breathing. Inhale 4s, Exhale 4s.</p>
+            </div>
+            <div class="breath-visual">
+                <div class="breath-circle" id="breathCircle">START</div>
+            </div>
+        </div>
+
+        <div class="grid-layout">
+            <div style="display:flex; flex-direction:column; gap:25px;" class="col-1">
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-bullseye"></i> Prime Focus 🎯</div>
+                    <div style="position:relative">
+                        <input type="text" id="goal1" placeholder="Main Priority..." style="padding-left:45px; font-weight:600;" oninput="autoSave()">
+                        <i class="fas fa-star" style="position:absolute; left:18px; top:50%; transform:translateY(-50%); color:#f1c40f; filter:drop-shadow(0 0 5px #f1c40f);"></i>
+                    </div>
+                    <input type="text" id="goal2" placeholder="Secondary Goal" oninput="autoSave()">
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="far fa-clock"></i> Timeline ⏳</div>
+                    <div class="schedule-box" id="scheduleContainer"></div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-lightbulb"></i> Wisdom 💡</div>
+                    <div style="text-align:center; padding:10px 0;">
+                        <span id="dailyQuote" style="font-style:italic; font-weight:400; display:block; margin-bottom:8px; line-height:1.4;"></span>
+                        <span id="quoteAuthor" style="font-weight:700; color:var(--accent); font-size:0.85rem;"></span>
+                    </div>
+                    <button class="btn-small" style="width:100%;" onclick="newQuote()">New Quote</button>
+                </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:25px;" class="col-2">
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-check-double"></i> Tasks ✅</div>
+                    <div id="todoContainer"></div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-stopwatch"></i> Focus Timer ⏱️</div>
+                    <div class="timer-display" id="timerDisplay">25:00</div>
+                    <div style="display:flex; justify-content:center; gap:10px;">
+                        <button class="btn-small" style="background:var(--accent); color:white; border:none;" onclick="startTimer()">Start</button>
+                        <button class="btn-small" onclick="pauseTimer()">Pause</button>
+                        <button class="btn-small" onclick="resetTimer()">Reset</button>
+                    </div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-headphones-alt"></i> Audio 🎵</div>
+                    <div style="display:flex; align-items:center; gap:15px; background:var(--glass-input); padding:15px; border-radius:15px; box-shadow:var(--input-carve);">
+                        <button class="play-btn-round" id="playBtn" onclick="toggleFocusSound()">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <div style="flex-grow:1;">
+                            <div style="font-weight:600; font-size:0.9rem;">Forest Rain</div>
+                            <input type="range" min="0" max="1" step="0.1" value="0.5" oninput="changeVolume(this.value)" style="width:100%; padding:0; height:4px; margin-top:5px;">
+                        </div>
+                    </div>
+                    <audio id="focusAudio" loop src="https://ia800501.us.archive.org/21/items/ForestSounds/forest.mp3"></audio>
+                </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:25px;" class="col-3">
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-heart"></i> Wellness ❤️</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-weight:600; font-size:0.9rem;">Hydration 💧</span>
+                        <div class="water-drops" id="waterTracker"></div>
+                    </div>
+                    <div style="height:1px; background:var(--border-shadow); margin:5px 0;"></div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-weight:600; font-size:0.9rem;">Mood ✨</span>
+                        <div class="moods">
+                            <div class="mood" onclick="setMood(1, this)">😫</div>
+                            <div class="mood" onclick="setMood(2, this)">😐</div>
+                            <div class="mood" onclick="setMood(3, this)">🙂</div>
+                            <div class="mood" onclick="setMood(4, this)">😁</div>
+                            <div class="mood" onclick="setMood(5, this)">🔥</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-calendar-check"></i> Habits 🔥</div>
+                    <div style="margin-bottom:15px;">
+                        <div style="font-weight:600; font-size:0.85rem; margin-bottom:5px;">Reading 📖</div>
+                        <div class="habit-grid" id="habitRead"></div>
+                    </div>
+                    <div>
+                        <div style="font-weight:600; font-size:0.85rem; margin-bottom:5px;">Exercise 💪</div>
+                        <div class="habit-grid" id="habitExercise"></div>
+                    </div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-wallet"></i> Expenses 💸</div>
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" id="expItem" placeholder="Item">
+                        <input type="number" id="expCost" placeholder="$" style="width:70px; text-align:center;">
+                        <button class="btn-small" onclick="addExpense()">+</button>
+                    </div>
+                    <div class="expense-list" id="expenseList" style="margin-top:15px; max-height:100px; overflow-y:auto;"></div>
+                    <div style="text-align:right; margin-top:10px; font-weight:700; color:var(--accent);">Total: $<span id="totalSpend">0.00</span></div>
+                </div>
+                <div class="section-card">
+                    <div class="section-title"><i class="fas fa-sticky-note"></i> Brain Dump 🧠</div>
+                    <div class="input-with-voice">
+                        <textarea id="notes" rows="3" placeholder="Ideas..." oninput="autoSave()"></textarea>
+                        <button class="voice-btn" onclick="startDictation('notes')"><i class="fas fa-microphone"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const HOURS = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+        const DAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+        let currentMood = 0, isPlaying = false, timerInterval, timeLeft = 1500, isTimerRunning = false, expenses = [], breathInterval, currentDateKey = "";
+
+        const QUOTES = [
+            {q: "Believe you can and you're halfway there.", a: "Theodore Roosevelt"},
+            {q: "Act as if what you do makes a difference.", a: "William James"},
+            {q: "Success is not final, failure is not fatal.", a: "Winston Churchill"},
+            {q: "Happiness depends upon ourselves.", a: "Aristotle"},
+            {q: "Turn your wounds into wisdom.", a: "Oprah Winfrey"},
+            {q: "Simplicity is the ultimate sophistication.", a: "Leonardo da Vinci"}
+        ];
+
+        function init() {
+            document.getElementById('dateInput').valueAsDate = new Date();
+            updateGreeting(); setDateKey(); newQuote();
+            
+            const savedTheme = localStorage.getItem('theme') || 'theme-sunset';
+            document.body.className = savedTheme;
+
+            renderSchedule(); renderHabits(); renderTodos(); renderWater();
+            loadData();
+        }
+
+        function setTheme(themeName) { document.body.className = themeName; localStorage.setItem('theme', themeName); }
+        function setDateKey() { currentDateKey = document.getElementById('dateInput').value; }
+
+        function dateChanged() {
+            setDateKey();
+            document.querySelectorAll('input[type="text"], textarea').forEach(el => el.value = "");
+            document.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
+            document.querySelectorAll('.custom-checkbox').forEach(el => el.classList.remove('checked'));
+            document.querySelectorAll('.todo-input').forEach(el => el.classList.remove('completed'));
+            document.querySelectorAll('.habit-circle').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.drop').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.mood').forEach(el => el.classList.remove('active'));
+            expenses = [];
+            renderExpenses(); newQuote(); loadData();
+        }
+
+        function changeDate(days) {
+            const dateInput = document.getElementById('dateInput');
+            const date = new Date(dateInput.value);
+            date.setDate(date.getDate() + days);
+            dateInput.value = date.toISOString().split('T')[0];
+            dateChanged();
+        }
+
+        function renderSchedule() {
+            const schedCont = document.getElementById('scheduleContainer');
+            schedCont.innerHTML = '';
+            HOURS.forEach(h => {
+                const time = h > 12 ? `${h-12} PM` : (h===12 ? '12 PM' : `${h} AM`);
+                schedCont.innerHTML += `
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                        <div style="font-weight:700; color:var(--accent); width:50px; text-align:right; font-size:0.8rem;">${time}</div>
+                        <input type="text" id="sched_${h}" oninput="autoSave()">
+                    </div>`;
+            });
+        }
+
+        function renderHabits() {
+            ['habitRead', 'habitExercise'].forEach(id => {
+                const el = document.getElementById(id);
+                el.innerHTML = '';
+                DAYS.forEach((d, i) => {
+                    el.innerHTML += `
+                        <div class="habit-day">
+                            <span class="habit-label" style="font-size:0.6rem; font-weight:700; opacity:0.7;">${d}</span>
+                            <div class="habit-circle" id="${id}_${i}" onclick="toggleHabit('${id}_${i}')"></div>
+                        </div>`;
+                });
+            });
+        }
+
+        function renderTodos() {
+            const todoCont = document.getElementById('todoContainer');
+            todoCont.innerHTML = '';
+            for(let i=0; i<6; i++) {
+                todoCont.innerHTML += `
+                    <div class="todo-item" style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+                        <div class="custom-checkbox" id="cb_todo_${i}" onclick="toggleCheck('todo', ${i})"><i class="fas fa-check"></i></div>
+                        <input type="checkbox" id="chk_todo_${i}" style="display:none">
+                        <input type="text" class="todo-input" id="todo_${i}" placeholder="Task ${i+1}" oninput="autoSave()">
+                    </div>`;
+            }
+        }
+
+        function renderWater() {
+            const waterCont = document.getElementById('waterTracker');
+            waterCont.innerHTML = '';
+            for(let i=0; i<8; i++) {
+                waterCont.innerHTML += `<i class="fas fa-tint drop" onclick="toggleWater(${i})"></i>`;
+            }
+        }
+
+        function updateGreeting() {
+            const h = new Date().getHours();
+            const g = document.getElementById('greeting');
+            if(h < 12) g.innerText = "Good Morning ☀️";
+            else if(h < 18) g.innerText = "Good Afternoon 🌤️";
+            else g.innerText = "Good Evening 🌙";
+        }
+
+        function newQuote() {
+            const r = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+            document.getElementById('dailyQuote').innerText = `"${r.q}"`;
+            document.getElementById('quoteAuthor').innerText = `- ${r.a}`;
+        }
+
+        function toggleCheck(type, i) {
+            const chk = document.getElementById(`chk_${type}_${i}`);
+            const box = document.getElementById(`cb_${type}_${i}`);
+            const inp = type === 'todo' ? document.getElementById(`todo_${i}`) : null;
+            
+            chk.checked = !chk.checked;
+            if(chk.checked) {
+                box.classList.add('checked');
+                if(inp) inp.classList.add('completed');
+                confetti({ particleCount: 30, spread: 50, origin: { y: 0.7 }, colors: ['#ff9f43', '#1dd1a1'] });
+            } else {
+                box.classList.remove('checked');
+                if(inp) inp.classList.remove('completed');
+            }
+            autoSave();
+        }
+
+        function toggleHabit(id) {
+            document.getElementById(id).classList.toggle('active');
+            autoSave();
+        }
+
+        function toggleWater(index) {
+            const drops = document.querySelectorAll('.drop');
+            let current = 0;
+            drops.forEach(d => { if(d.classList.contains('active')) current++; });
+            let target = index + 1;
+            if(current === target) target = index;
+            drops.forEach((d, i) => {
+                if(i < target) d.classList.add('active');
+                else d.classList.remove('active');
+            });
+            autoSave();
+        }
+
+        function setMood(val, el) {
+            // Updated Toggle Logic
+            if (currentMood === val) {
+                currentMood = 0;
+                el.classList.remove('active');
+            } else {
+                currentMood = val;
+                document.querySelectorAll('.mood').forEach(m => m.classList.remove('active'));
+                el.classList.add('active');
+            }
+            autoSave();
+        }
+
+        function toggleFocusSound() {
+            const audio = document.getElementById('focusAudio');
+            const btn = document.getElementById('playBtn');
+            const icon = btn.querySelector('i');
+            if(isPlaying) {
+                audio.pause();
+                icon.classList.remove('fa-pause'); icon.classList.add('fa-play');
+                btn.classList.remove('playing');
+            } else {
+                audio.volume = document.querySelector('input[type="range"]').value;
+                audio.play().catch(e => console.log(e));
+                icon.classList.remove('fa-play'); icon.classList.add('fa-pause');
+                btn.classList.add('playing');
+            }
+            isPlaying = !isPlaying;
+        }
+        function changeVolume(val) { document.getElementById('focusAudio').volume = val; }
+
+        function toggleBreath(el) {
+            const circle = document.getElementById('breathCircle');
+            if(breathInterval) {
+                clearInterval(breathInterval); breathInterval = null;
+                circle.classList.remove('inhale'); circle.innerText = "START";
+            } else {
+                const breathe = () => {
+                    circle.classList.add('inhale'); circle.innerText = "INHALE";
+                    setTimeout(() => { circle.classList.remove('inhale'); circle.innerText = "EXHALE"; }, 4000);
+                };
+                breathe();
+                breathInterval = setInterval(breathe, 8000);
+            }
+        }
+
+        function updateTimerDisplay() {
+            const m = Math.floor(timeLeft / 60);
+            const s = timeLeft % 60;
+            document.getElementById('timerDisplay').innerText = 
+                `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+        function startTimer() {
+            if(isTimerRunning) return;
+            isTimerRunning = true;
+            timerInterval = setInterval(() => {
+                if(timeLeft > 0) { timeLeft--; updateTimerDisplay(); } 
+                else { pauseTimer(); confetti(); alert("Session Complete!"); resetTimer(); }
+            }, 1000);
+        }
+        function pauseTimer() { clearInterval(timerInterval); isTimerRunning = false; }
+        function resetTimer() { pauseTimer(); timeLeft = 1500; updateTimerDisplay(); }
+
+        function addExpense() {
+            const item = document.getElementById('expItem').value;
+            const cost = parseFloat(document.getElementById('expCost').value);
+            if(item && cost) {
+                expenses.push({item, cost});
+                document.getElementById('expItem').value = '';
+                document.getElementById('expCost').value = '';
+                renderExpenses();
+                autoSave();
+            }
+        }
+        function renderExpenses() {
+            const list = document.getElementById('expenseList');
+            const total = document.getElementById('totalSpend');
+            list.innerHTML = '';
+            let sum = 0;
+            if(expenses && expenses.length > 0) {
+                expenses.forEach((ex, idx) => {
+                    sum += ex.cost;
+                    list.innerHTML += `
+                        <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(0,0,0,0.05); font-size:0.9rem;">
+                            <span>${ex.item}</span>
+                            <span>$${ex.cost.toFixed(2)} <i class="fas fa-times" style="color:#e74c3c; cursor:pointer; margin-left:8px;" onclick="removeExpense(${idx})"></i></span>
+                        </div>`;
+                });
+            }
+            total.innerText = sum.toFixed(2);
+        }
+        function removeExpense(idx) { expenses.splice(idx, 1); renderExpenses(); autoSave(); }
+
+        function startDictation(inputId) {
+            if ('webkitSpeechRecognition' in window) {
+                const recognition = new window.webkitSpeechRecognition();
+                const btn = document.querySelector(`button[onclick="startDictation('${inputId}')"]`);
+                recognition.lang = 'en-US';
+                recognition.start();
+                btn.classList.add('listening');
+                recognition.onresult = function(event) {
+                    const res = event.results[0][0].transcript;
+                    const field = document.getElementById(inputId);
+                    field.value = field.value ? field.value + " " + res : res;
+                    autoSave();
+                };
+                recognition.onspeechend = function() { recognition.stop(); btn.classList.remove('listening'); };
+            } else { console.log("Voice input requires Chrome."); }
+        }
+
+        // --- SAVE SYSTEM ---
+        function saveData() {
+            const data = {
+                text: {}, checks: {}, habits: {}, water: 0,
+                mood: currentMood, expenses: expenses
+            };
+            document.querySelectorAll('input[type="text"], textarea').forEach(el => data.text[el.id] = el.value);
+            document.querySelectorAll('input[type="checkbox"]').forEach(el => data.checks[el.id] = el.checked);
+            document.querySelectorAll('.habit-circle').forEach(el => data.habits[el.id] = el.classList.contains('active'));
+            
+            let w = 0;
+            document.querySelectorAll('.drop').forEach(d => { if(d.classList.contains('active')) w++; });
+            data.water = w;
+
+            localStorage.setItem('aether_data_' + currentDateKey, JSON.stringify(data));
+            calcProgress();
+        }
+
+        function loadData() {
+            const json = localStorage.getItem('aether_data_' + currentDateKey);
+            if(json) {
+                const data = JSON.parse(json);
+                if(data.text) for(const [k, v] of Object.entries(data.text)) { const el = document.getElementById(k); if(el) el.value = v; }
+                
+                if(data.checks) {
+                    for(const [k, v] of Object.entries(data.checks)) {
+                        if(v) {
+                            const id = k.split('_')[2];
+                            document.getElementById(k).checked = true;
+                            if(document.getElementById(`cb_todo_${id}`)) document.getElementById(`cb_todo_${id}`).classList.add('checked');
+                            if(document.getElementById(`todo_${id}`)) document.getElementById(`todo_${id}`).classList.add('completed');
+                        }
+                    }
+                }
+
+                if(data.habits) {
+                    for(const [k, v] of Object.entries(data.habits)) {
+                        if(v && document.getElementById(k)) document.getElementById(k).classList.add('active');
+                    }
+                }
+
+                if(data.water) {
+                    document.querySelectorAll('.drop').forEach((d, i) => {
+                        if(i < data.water) d.classList.add('active');
+                    });
+                }
+
+                if(data.mood) {
+                    currentMood = data.mood;
+                    const moods = document.querySelectorAll('.mood');
+                    if(moods[data.mood-1]) moods[data.mood-1].classList.add('active');
+                }
+
+                expenses = data.expenses || []; 
+                renderExpenses();
+            } else {
+                currentMood = 0;
+                expenses = [];
+                renderExpenses();
+            }
+            calcProgress();
+        }
+
+        function calcProgress() {
+            const todoChecked = document.querySelectorAll('input[id^="chk_todo_"]:checked').length;
+            let waterLevel = 0;
+            document.querySelectorAll('.drop').forEach(d => { if(d.classList.contains('active')) waterLevel++; });
+            const goal1 = document.getElementById('goal1').value.trim() !== "" ? 1 : 0;
+            
+            const maxPoints = 6 + 8 + 1; 
+            const curPoints = todoChecked + waterLevel + goal1;
+            const perc = Math.min(100, Math.round((curPoints / maxPoints) * 100));
+            
+            document.getElementById('progressBar').style.width = perc + '%';
+            document.getElementById('progressPercent').innerText = perc + '%';
+            if(perc === 100) confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        }
+
+        function clearData() {
+            if(confirm("Clear data for " + currentDateKey + "?")) {
+                localStorage.removeItem('aether_data_' + currentDateKey);
+                dateChanged(); 
+            }
+        }
+
+        function autoSave() { saveData(); }
+        
+        init();
+    </script>
+</body>
+</html>

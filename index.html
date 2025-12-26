@@ -27,7 +27,7 @@
             display: flex; flex-direction: column;
             padding: 20px; z-index: 20;
             box-shadow: 5px 0 20px rgba(0,0,0,0.5);
-            flex-shrink: 0; /* Prevent shrinking */
+            flex-shrink: 0; 
         }
 
         .brand {
@@ -53,7 +53,6 @@
         .card:hover { transform: translateX(5px); border-color: var(--accent); background: #1a1a1a; }
         .card.active { border-color: var(--accent); background: linear-gradient(90deg, #1a1a1a, #000); }
         
-        /* Active Indicator Glow */
         .card.active::before {
             content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--accent);
         }
@@ -90,64 +89,39 @@
         .c5 .card-icon { color: #3498db; box-shadow: 0 0 8px rgba(52, 152, 219, 0.2); }
         .c6 .card-icon { color: #e74c3c; box-shadow: 0 0 8px rgba(231, 76, 60, 0.2); }
         .c7 .card-icon { color: #00f3ff; box-shadow: 0 0 8px rgba(0, 243, 255, 0.2); }
+        /* NEW Planner Color */
+        .c8 .card-icon { color: #f1c40f; box-shadow: 0 0 8px rgba(241, 196, 15, 0.2); }
 
         /* --- 📱 MOBILE RESPONSIVE TWEAKS --- */
         @media (max-width: 768px) {
-            body { 
-                flex-direction: column; /* Stack vertically */
-            }
+            body { flex-direction: column; }
 
             .sidebar {
-                width: 100%;
-                height: auto;
-                max-height: 85px; /* Limit height */
-                padding: 10px;
-                border-right: none;
-                border-bottom: 1px solid #333;
-                background: #000;
-                flex-direction: row; /* Horizontal layout */
-                align-items: center;
-                gap: 10px;
+                width: 100%; height: auto; max-height: 85px;
+                padding: 10px; border-right: none; border-bottom: 1px solid #333;
+                background: #000; flex-direction: row; align-items: center; gap: 10px;
             }
 
-            .brand {
-                display: none; /* Hide brand to save space on mobile */
-            }
+            .brand { display: none; }
 
             .menu-grid {
-                flex-direction: row; /* Horizontal Scroll */
-                gap: 10px;
-                padding-right: 0;
-                overflow-x: auto;
-                overflow-y: hidden;
-                width: 100%;
-                scroll-behavior: smooth;
-                -webkit-overflow-scrolling: touch; /* Smooth iOS scrolling */
+                flex-direction: row; gap: 10px; padding-right: 0;
+                overflow-x: auto; overflow-y: hidden; width: 100%;
+                scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
             }
-            
-            /* Hide scrollbar on mobile but allow scrolling */
             .menu-grid::-webkit-scrollbar { display: none; }
 
             .card {
-                min-width: 140px; /* Fixed width cards */
-                padding: 8px 10px;
-                flex-direction: row;
-                justify-content: flex-start;
-                background: #111;
+                min-width: 140px; padding: 8px 10px;
+                flex-direction: row; justify-content: flex-start; background: #111;
             }
+            .card:hover { transform: none; } 
             
-            .card:hover { transform: none; } /* Disable hover move on mobile */
-            
-            .card-icon {
-                width: 30px; height: 30px; font-size: 0.9rem;
-            }
-            
+            .card-icon { width: 30px; height: 30px; font-size: 0.9rem; }
             .card-info h4 { font-size: 0.8rem; }
-            .card-info p { display: none; /* Hide description on mobile for space */ }
+            .card-info p { display: none; }
 
-            .main-view {
-                height: calc(100vh - 85px); /* Remaining height */
-            }
+            .main-view { height: calc(100vh - 85px); }
         }
     </style>
 </head>
@@ -155,63 +129,46 @@
 
     <div class="sidebar">
         <div class="brand">Nexus Archive</div>
-        
         <div class="menu-grid">
             
             <div class="card c1 active" onclick="loadFrame(1, this)">
                 <div class="card-icon"><i class="fas fa-gem"></i></div>
-                <div class="card-info">
-                    <h4>Diamond</h4>
-                    <p>Luxury</p>
-                </div>
+                <div class="card-info"><h4>Diamond</h4><p>Luxury</p></div>
             </div>
 
             <div class="card c2" onclick="loadFrame(2, this)">
                 <div class="card-icon"><i class="fas fa-leaf"></i></div>
-                <div class="card-info">
-                    <h4>Botanical</h4>
-                    <p>Nature</p>
-                </div>
+                <div class="card-info"><h4>Botanical</h4><p>Nature</p></div>
             </div>
 
             <div class="card c3" onclick="loadFrame(3, this)">
                 <div class="card-icon"><i class="fas fa-book"></i></div>
-                <div class="card-info">
-                    <h4>Minimal</h4>
-                    <p>Focus</p>
-                </div>
+                <div class="card-info"><h4>Minimal</h4><p>Focus</p></div>
             </div>
 
             <div class="card c4" onclick="loadFrame(4, this)">
                 <div class="card-icon"><i class="fas fa-magic"></i></div>
-                <div class="card-info">
-                    <h4>Royal</h4>
-                    <p>Magic</p>
-                </div>
+                <div class="card-info"><h4>Royal</h4><p>Magic</p></div>
             </div>
 
             <div class="card c5" onclick="loadFrame(5, this)">
                 <div class="card-icon"><i class="fas fa-water"></i></div>
-                <div class="card-info">
-                    <h4>Oceanic</h4>
-                    <p>Deep</p>
-                </div>
+                <div class="card-info"><h4>Oceanic</h4><p>Deep</p></div>
             </div>
 
             <div class="card c6" onclick="loadFrame(6, this)">
                 <div class="card-icon"><i class="fas fa-fire"></i></div>
-                <div class="card-info">
-                    <h4>Dragon</h4>
-                    <p>Fire</p>
-                </div>
+                <div class="card-info"><h4>Dragon</h4><p>Fire</p></div>
             </div>
 
             <div class="card c7" onclick="loadFrame(7, this)">
                 <div class="card-icon"><i class="fas fa-bolt"></i></div>
-                <div class="card-info">
-                    <h4>Archive 7</h4>
-                    <p>Custom</p>
-                </div>
+                <div class="card-info"><h4>Archive 7</h4><p>Custom</p></div>
+            </div>
+
+            <div class="card c8" onclick="loadFrame(8, this)">
+                <div class="card-icon"><i class="fas fa-calendar-check"></i></div>
+                <div class="card-info"><h4>Daily Plan</h4><p>Productivity</p></div>
             </div>
 
         </div>
@@ -223,18 +180,15 @@
 
     <script>
         function loadFrame(id, element) {
-            // Update active styling
             document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
             element.classList.add('active');
-
-            // Scroll the selected item into view (Mobile UX)
             element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
 
-            // Load Content
             const frame = document.getElementById('contentFrame');
             frame.classList.remove('loaded');
             
             setTimeout(() => {
+                // This will look for 1.html, 2.html ... 8.html
                 frame.src = id + ".html";
                 frame.onload = () => frame.classList.add('loaded');
             }, 150);
