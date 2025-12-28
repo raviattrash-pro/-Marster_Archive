@@ -90,8 +90,9 @@
         .c6 .card-icon { color: #e74c3c; box-shadow: 0 0 8px rgba(231, 76, 60, 0.2); }
         .c7 .card-icon { color: #00f3ff; box-shadow: 0 0 8px rgba(0, 243, 255, 0.2); }
         .c8 .card-icon { color: #f1c40f; box-shadow: 0 0 8px rgba(241, 196, 15, 0.2); }
-        /* NEW GlassyBoard Color */
         .c9 .card-icon { color: #ff6b6b; box-shadow: 0 0 8px rgba(255, 107, 107, 0.2); }
+        /* NEW Nexus Color */
+        .c10 .card-icon { color: #00f3ff; box-shadow: 0 0 8px rgba(0, 243, 255, 0.4); border-color: #00f3ff; }
 
         /* --- 📱 MOBILE RESPONSIVE --- */
         @media (max-width: 768px) {
@@ -132,49 +133,19 @@
         <div class="brand">Nexus Archive</div>
         <div class="menu-grid">
             
-            <div class="card c1 active" onclick="loadFrame(1, this)">
-                <div class="card-icon"><i class="fas fa-gem"></i></div>
-                <div class="card-info"><h4>Diamond</h4><p>Luxury</p></div>
-            </div>
+            <div class="card c1 active" onclick="loadFrame(1, this)"><div class="card-icon"><i class="fas fa-gem"></i></div><div class="card-info"><h4>Diamond</h4><p>Luxury</p></div></div>
+            <div class="card c2" onclick="loadFrame(2, this)"><div class="card-icon"><i class="fas fa-leaf"></i></div><div class="card-info"><h4>Botanical</h4><p>Nature</p></div></div>
+            <div class="card c3" onclick="loadFrame(3, this)"><div class="card-icon"><i class="fas fa-book"></i></div><div class="card-info"><h4>Minimal</h4><p>Focus</p></div></div>
+            <div class="card c4" onclick="loadFrame(4, this)"><div class="card-icon"><i class="fas fa-magic"></i></div><div class="card-info"><h4>Royal</h4><p>Magic</p></div></div>
+            <div class="card c5" onclick="loadFrame(5, this)"><div class="card-icon"><i class="fas fa-water"></i></div><div class="card-info"><h4>Oceanic</h4><p>Deep</p></div></div>
+            <div class="card c6" onclick="loadFrame(6, this)"><div class="card-icon"><i class="fas fa-fire"></i></div><div class="card-info"><h4>Dragon</h4><p>Fire</p></div></div>
+            <div class="card c7" onclick="loadFrame(7, this)"><div class="card-icon"><i class="fas fa-bolt"></i></div><div class="card-info"><h4>Archive 7</h4><p>Custom</p></div></div>
+            <div class="card c8" onclick="loadFrame(8, this)"><div class="card-icon"><i class="fas fa-calendar-check"></i></div><div class="card-info"><h4>Daily Plan</h4><p>Productivity</p></div></div>
+            <div class="card c9" onclick="loadFrame(9, this)"><div class="card-icon"><i class="fas fa-sticky-note"></i></div><div class="card-info"><h4>GlassyBoard</h4><p>Notes</p></div></div>
 
-            <div class="card c2" onclick="loadFrame(2, this)">
-                <div class="card-icon"><i class="fas fa-leaf"></i></div>
-                <div class="card-info"><h4>Botanical</h4><p>Nature</p></div>
-            </div>
-
-            <div class="card c3" onclick="loadFrame(3, this)">
-                <div class="card-icon"><i class="fas fa-book"></i></div>
-                <div class="card-info"><h4>Minimal</h4><p>Focus</p></div>
-            </div>
-
-            <div class="card c4" onclick="loadFrame(4, this)">
-                <div class="card-icon"><i class="fas fa-magic"></i></div>
-                <div class="card-info"><h4>Royal</h4><p>Magic</p></div>
-            </div>
-
-            <div class="card c5" onclick="loadFrame(5, this)">
-                <div class="card-icon"><i class="fas fa-water"></i></div>
-                <div class="card-info"><h4>Oceanic</h4><p>Deep</p></div>
-            </div>
-
-            <div class="card c6" onclick="loadFrame(6, this)">
-                <div class="card-icon"><i class="fas fa-fire"></i></div>
-                <div class="card-info"><h4>Dragon</h4><p>Fire</p></div>
-            </div>
-
-            <div class="card c7" onclick="loadFrame(7, this)">
-                <div class="card-icon"><i class="fas fa-bolt"></i></div>
-                <div class="card-info"><h4>Archive 7</h4><p>Custom</p></div>
-            </div>
-
-            <div class="card c8" onclick="loadFrame(8, this)">
-                <div class="card-icon"><i class="fas fa-calendar-check"></i></div>
-                <div class="card-info"><h4>Daily Plan</h4><p>Productivity</p></div>
-            </div>
-
-            <div class="card c9" onclick="loadFrame(9, this)">
-                <div class="card-icon"><i class="fas fa-sticky-note"></i></div>
-                <div class="card-info"><h4>GlassyBoard</h4><p>Notes</p></div>
+            <div class="card c10" onclick="loadFrame(10, this)">
+                <div class="card-icon"><i class="fas fa-cube"></i></div>
+                <div class="card-info"><h4>Nexus</h4><p>Gamified</p></div>
             </div>
 
         </div>
@@ -199,7 +170,6 @@
             }, 150);
         }
 
-        // Initialize with first archive
         window.onload = () => {
             const firstCard = document.querySelector('.c1');
             if(firstCard) loadFrame(1, firstCard);
